@@ -10,9 +10,6 @@
   "icon": "assets/chat_language_translate/icon.png",
   "environment": "*",
   "entrypoints": {
-    "fabric-datagen": [
-      "duke.e.chat_language_translate.client.Chat_language_translateDataGenerator"
-    ],
     "client": [
       "duke.e.chat_language_translate.client.Chat_language_translateClient"
     ],
