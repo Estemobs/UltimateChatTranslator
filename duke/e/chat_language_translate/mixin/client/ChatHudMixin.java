@@ -17,24 +17,10 @@ public class ChatHudMixin {
    private static final String TRANSLATION_PREFIX = "🌐 ";
 
    @Inject(
-      method = "addMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/message/MessageSignatureData;ILnet/minecraft/client/gui/hud/ChatHudLine$Icon;Z)V",
-      at = @At("HEAD"),
-      cancellable = false
-   )
-   private void onAddMessageFull(Text message, Object signature, int ticks, Object icon, boolean refresh, CallbackInfo ci) {
-      handleMessage(message);
-   }
-
-   @Inject(
       method = "addMessage(Lnet/minecraft/text/Text;)V",
-      at = @At("HEAD"),
-      cancellable = false
+      at = @At("HEAD")
    )
-   private void onAddMessageSimple(Text message, CallbackInfo ci) {
-      handleMessage(message);
-   }
-
-   private void handleMessage(Text message) {
+   private void onAddMessage(Text message, CallbackInfo ci) {
       try {
          if (!ModConfig.get().modEnabled) {
             return;
@@ -62,37 +48,18 @@ public class ChatHudMixin {
             return;
          }
 
-         MinecraftClient client = MinecraftClient.getInstance();
-         String playerName = client.getSession().getUsername();
-         boolean isSentMessage = rawText.contains("<" + playerName + ">");
+         // On traduit TOUT automatiquement
+         String targetLang = ModConfig.get().primaryLanguage.getCode();
 
-         sendDebug("Joueur: " + playerName + " | IsSent: " + isSentMessage);
+         sendDebug("Traduction vers: " + targetLang);
 
-         String targetLang;
-         String textToTranslate = rawText;
-
-         if (isSentMessage) {
-            targetLang = ModConfig.get().sentLanguage.getCode();
-            // Extrait juste le contenu du message (sans le <username>)
-            int endIndex = rawText.indexOf(">") + 1;
-            if (endIndex > 0 && endIndex < rawText.length()) {
-               textToTranslate = rawText.substring(endIndex).trim();
-            }
-            sendDebug("🟢 ENVOYÉ | Contenu: '" + textToTranslate + "' → " + targetLang);
-         } else {
-            targetLang = ModConfig.get().primaryLanguage.getCode();
-            sendDebug("🔵 REÇU | → " + targetLang);
-         }
-
-         String finalTextToTranslate = textToTranslate;
-         String finalTargetLang = targetLang;
-
-         TranslationService.translate(textToTranslate, targetLang).thenAccept((result) -> {
+         TranslationService.translate(rawText, targetLang).thenAccept((result) -> {
             if (result != null && result.translatedText() != null && !result.translatedText().isBlank()) {
                sendDebug("✅ Résultat: " + result.translatedText());
                MutableText translatedMsg = Text.literal(TRANSLATION_PREFIX + result.translatedText())
-                  .setStyle(Style.EMPTY.withItalic(true).withColor(isSentMessage ? 0x00FF00 : 0xFFFF00));
+                  .setStyle(Style.EMPTY.withItalic(true).withColor(0xFFFF00));
 
+               MinecraftClient client = MinecraftClient.getInstance();
                client.execute(() -> {
                   if (client.inGameHud != null) {
                      client.inGameHud.getChatHud().addMessage(translatedMsg);
@@ -103,7 +70,6 @@ public class ChatHudMixin {
             }
          }).exceptionally((error) -> {
             sendDebug("❌ ERREUR: " + error.getMessage());
-            error.printStackTrace();
             return null;
          });
 
