@@ -1,106 +1,104 @@
-# Chat Language Translate
+# Chat Language Translate - Guide Installation Linux
 
-Chat Language Translate est un mod Fabric client pour Minecraft 1.21.1.
-Son but est simple: lire les messages du chat entrant, les traduire vers une langue cible, puis afficher la traduction dans le chat.
+## ⚙️ Prérequis
 
-## Ce que fait le mod
-
-- Il intercepte les messages du chat côté client.
-- Il peut traduire automatiquement les messages vers la langue choisie.
-- Il peut aussi ajouter un bouton cliquable pour traduire un message à la demande.
-- Il enregistre un petit fichier de configuration dans le dossier `config` de Minecraft.
-
-## Comment ça marche
-
-Le fonctionnement est réparti en plusieurs parties:
-
-- `fabric.mod.json` déclare le mod Fabric et ses points d'entrée.
-- `duke/e/chat_language_translate/client/Chat_language_translateClient.java` charge la configuration et ajoute la commande client `/clt_translate`.
-- `duke/e/chat_language_translate/mixin/client/ChatHudMixin.java` intercepte les messages du chat.
-- `duke/e/chat_language_translate/client/TranslationService.java` appelle un service de traduction en ligne.
-- `duke/e/chat_language_translate/client/ModConfig.java` stocke les réglages.
-- `duke/e/chat_language_translate/client/ModMenuIntegration.java` ajoute l'écran de configuration dans Mod Menu.
-
-## Réglages disponibles
-
-Dans la configuration, tu peux changer:
-
-- la langue cible principale
-- l'activation ou non du mod
-- le mode traduction automatique ou bouton cliquable
-- le texte du bouton de traduction
-
-Le fichier de config est créé dans:
-
-`config/chat_language_translate.json`
-
-## Prérequis
-
-Pour compiler le mod, il faut:
-
-- Java 21
-- Gradle installé sur ta machine
-- une connexion internet pour télécharger les dépendances Fabric au premier build
-
-## Générer le fichier JAR
-
-1. Ouvre un terminal dans le dossier du projet.
-2. Lance la compilation:
-
+### Java 21
 ```bash
-gradle build
+# Arch Linux
+sudo pacman -S jdk21-openjdk
+
+# Debian/Ubuntu
+sudo apt install openjdk-21-jdk
+
+# Vérifier l'installation
+java -version
 ```
 
-3. Quand la compilation est finie, le JAR se trouve dans:
+**Gradle 8.8** est téléchargé automatiquement par le wrapper. Aucune installation manuelle requise.
 
+---
+
+## 🚀 Installation du projet
+
+### 1. Cloner le repository
 ```bash
-build/libs/
+git clone <repository-url>
+cd ChatLanguageTranslate
 ```
 
-Le fichier à prendre est généralement celui qui ressemble à:
-
+### 2. Compiler le projet
 ```bash
-chat_language_translate-1.0.0.jar
+./gradlew build
 ```
 
-## Installer le mod dans Minecraft
+**Notes:**
+- La première compilation prend plusieurs minutes (télécharge Gradle 8.8, Minecraft, dépendances)
+- Gradle va aussi générer/remapper les sources Minecraft automatiquement
 
-1. Ouvre ton dossier Minecraft Fabric.
-2. Va dans le dossier `mods`.
-3. Copie le fichier JAR généré dans ce dossier.
-4. Lance Minecraft avec Fabric 1.21.1.
+### 3. Récupérer le JAR compilé
+```bash
+ls build/libs/
+```
 
-## Utilisation en jeu
+Le fichier JAR est: `chat_language_translate-1.0.0.jar`
 
-### Mode traduction automatique
+---
 
-Si l'option auto translate est activée, chaque message entrant est traduit automatiquement vers la langue choisie.
+## 📖 À propos du mod
 
-### Mode bouton de traduction
+Chat Language Translate est un mod Fabric client pour Minecraft 1.21.1 qui:
+- Intercepte les messages du chat entrants
+- Peut les traduire automatiquement ou afficher un bouton de traduction
+- Enregistre la configuration dans `config/chat_language_translate.json`
 
-Si l'option auto translate est désactivée, les messages du chat affichent un bouton de traduction.
-Cliquer sur ce bouton lance la commande client `/clt_translate` pour traduire le message.
+---
 
-## Dépendances importantes
+## 🔧 Dépannage
 
-Ce projet utilise:
+### "java: command not found"
+Installer Java 21 (voir section Prérequis)
 
-- Fabric Loader
-- Fabric API
-- Mod Menu, mais seulement en suggestion pour l'écran de configuration
+### Erreurs de compilation au premier build
+C'est normal. Relancer:
+```bash
+./gradlew clean build
+```
 
-## Notes
+### Réinitialiser complètement
+```bash
+rm -rf build .gradle
+./gradlew build
+```
 
-- Le projet a été extrait depuis un fichier Java, donc l'arborescence n'est pas celle d'un projet Fabric standard.
-- Les sources Java sont dans `duke/` au lieu de `src/main/java/`.
-- Le mod envoie le texte à un service externe de traduction pour produire le résultat.
+---
 
-## Si ça ne compile pas
+## 📦 Versions utilisées
 
-Si Gradle affiche une erreur, vérifie d'abord:
+| Composant | Version |
+|-----------|---------|
+| Java | 21 |
+| Gradle | 8.8 |
+| Minecraft | 1.21.1 |
+| Fabric Loader | 0.18.6 |
+| Fabric API | 0.116.8+1.21.1 |
+| Yarn Mappings | 1.21.1+build.1 |
 
-- que Java 21 est installé
-- que Gradle est disponible dans le terminal
-- que tu es bien dans le dossier du projet
+---
 
-Si tu veux, je peux aussi te préparer un vrai wrapper Gradle pour que tu puisses lancer `./gradlew build` sans installer Gradle à la main.
+## 📁 Structure du projet
+
+```
+.
+├── build.gradle              # Configuration Gradle
+├── gradle.properties         # Versions dépendances
+├── gradlew / gradle/wrapper/ # Gradle wrapper
+├── duke/e/chat_language_translate/
+│   ├── Chat_language_translate.java
+│   ├── client/
+│   │   ├── Chat_language_translateClient.java
+│   │   ├── ModConfig.java
+│   │   └── TranslationService.java
+│   └── mixin/client/ChatHudMixin.java
+├── assets/                   # Ressources
+└── fabric.mod.json          # Config Fabric
+```

@@ -17,6 +17,10 @@ repositories {
     }
 }
 
+loom {
+    splitEnvironmentSourceSets()
+}
+
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
@@ -25,25 +29,6 @@ dependencies {
     modCompileOnly "com.terraformersmc:modmenu:${project.modmenu_version}"
 }
 
-sourceSets {
-    main {
-        java {
-            srcDirs = ['src/main/java', 'duke']
-        }
-        resources {
-            srcDirs = ['src/main/resources', '.']
-            exclude 'src/**', 'duke/**', '.gradle/**', 'build/**', 'gradle/**', '.git/**'
-        }
-    }
-    client {
-        java {
-            srcDirs = ['src/client/java', 'duke']
-        }
-        resources {
-            srcDirs = ['src/client/resources']
-        }
-    }
-}
 
 tasks.withType(JavaCompile).configureEach {
     it.options.encoding = 'UTF-8'

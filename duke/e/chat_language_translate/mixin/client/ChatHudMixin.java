@@ -8,29 +8,27 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.HoverEvent;
-import net.minecraft.class_124;
-import net.minecraft.class_2561;
-import net.minecraft.class_2583;
-import net.minecraft.class_310;
-import net.minecraft.class_338;
-import net.minecraft.class_5250;
-import net.minecraft.class_7469;
-import net.minecraft.class_7591;
+import net.minecraft.text.Text;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Style;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.hud.ChatHud;
+import net.minecraft.client.network.message.MessageSignatureData;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin({class_338.class})
+@Mixin(ChatHud.class)
 public class ChatHudMixin {
    private static final Set<String> PENDING = Collections.newSetFromMap(new ConcurrentHashMap());
 
    @Inject(
-      method = {"method_44811"},
+      method = {"addMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/message/MessageSignatureData;Lnet/minecraft/client/gui/hud/ChatHud$MessageIndicator;)V"},
       at = {@At("HEAD")},
       cancellable = true
    )
-   private void onAddMessage(class_2561 message, class_7469 signature, class_7591 indicator, CallbackInfo ci) {
+   private void onAddMessage(Text message, MessageSignatureData signature, ChatHud.MessageIndicator indicator, CallbackInfo ci) {
       if (ModConfig.get().modEnabled) {
          String rawText = message.getString();
          if (rawText != null && !rawText.isBlank()) {
@@ -53,11 +51,11 @@ public class ChatHudMixin {
                                  String normalizedTarget = targetLang.split("-")[0].toLowerCase().trim();
                                  if (!normalizedDetected.equals(normalizedTarget)) {
                                     String var10000 = targetLang.toUpperCase();
-                                    class_5250 translationText = class_2561.method_43470("  ↳ (" + var10000 + ") " + translated).method_10862(class_2583.field_24360.method_10978(true).method_10977(class_124.field_1080));
-                                    class_310 client = class_310.method_1551();
+                                    MutableText translationText = Text.literal("  ↳ (" + var10000 + ") " + translated).setStyle(Style.EMPTY.withItalic(true).withColor(0xFF00));
+                                    MinecraftClient client = MinecraftClient.getInstance();
                                     client.execute(() -> {
-                                       if (client.field_1705 != null) {
-                                          client.field_1705.method_1743().method_1812(translationText);
+                                       if (client.inGameHud != null) {
+                                          client.inGameHud.getChatHud().addMessage(translationText);
                                        }
 
                                     });
@@ -75,15 +73,15 @@ public class ChatHudMixin {
                      var10000 = String.valueOf(rawText.hashCode());
                      String cacheKey = var10000 + "_" + System.currentTimeMillis();
                      Chat_language_translateClient.TRANSLATION_CACHE.put(cacheKey, rawText);
-                     class_5250 button = class_2561.method_43470(" " + btnText).method_10862(class_2583.field_24360.method_10977(class_124.field_1065).method_10958(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/clt_translate " + cacheKey)).method_10949(new HoverEvent(HoverEvent.Action.SHOW_TEXT, class_2561.method_43470(targetLangEnum.getHoverText()))));
+                     MutableText button = Text.literal(" " + btnText).setStyle(Style.EMPTY.withColor(0x00FF00).withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/clt_translate " + cacheKey)).withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal(targetLangEnum.getHoverText()))));
                      if (!PENDING.contains("mod_" + msgKey)) {
                         PENDING.add("mod_" + msgKey);
                         ci.cancel();
-                        class_5250 newMsg = message.method_27661().method_10852(button);
-                        class_310 client = class_310.method_1551();
+                        MutableText newMsg = ((MutableText) message).append(button);
+                        MinecraftClient client = MinecraftClient.getInstance();
                         client.execute(() -> {
-                           if (client.field_1705 != null) {
-                              client.field_1705.method_1743().method_1812(newMsg);
+                           if (client.inGameHud != null) {
+                              client.inGameHud.getChatHud().addMessage(newMsg);
                            }
 
                         });
