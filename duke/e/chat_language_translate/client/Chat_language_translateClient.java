@@ -18,6 +18,17 @@ public class Chat_language_translateClient implements ClientModInitializer {
 
    public void onInitializeClient() {
       ModConfig.load();
+
+      // Message de démarrage
+      MinecraftClient.getInstance().execute(() -> {
+         MinecraftClient client = MinecraftClient.getInstance();
+         if (client.inGameHud != null) {
+            MutableText startMsg = Text.literal("✓ Chat Language Translate chargé!")
+               .setStyle(Style.EMPTY.withColor(0x00FF00));
+            client.inGameHud.getChatHud().addMessage(startMsg);
+         }
+      });
+
       ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
          dispatcher.register((LiteralArgumentBuilder)ClientCommandManager.literal("clt_translate").then(ClientCommandManager.argument("cacheKey", StringArgumentType.word()).executes((context) -> {
             String cacheKey = StringArgumentType.getString(context, "cacheKey");
