@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "id": "chat_language_translate",
+  "version": "1",
+  "name": "Chat Language Translate",
+  "description": "Translates incoming chat messages to your configured primary language.",
+  "authors": [],
+  "contact": {},
+  "license": "All-Rights-Reserved",
+  "icon": "assets/chat_language_translate/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "fabric-datagen": [
+      "duke.e.chat_language_translate.client.Chat_language_translateDataGenerator"
+    ],
+    "client": [
+      "duke.e.chat_language_translate.client.Chat_language_translateClient"
+    ],
+    "main": [
+      "duke.e.chat_language_translate.Chat_language_translate"
+    ],
+    "modmenu": [
+      "duke.e.chat_language_translate.client.ModMenuIntegration"
+    ]
+  },
+  "mixins": [
+    "chat_language_translate.mixins.json",
+    {
+      "config": "chat_language_translate.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=0.18.4",
+    "fabric-api": "*",
+    "minecraft": ">=1.21",
+    "modmenu": "*"
+  }
+}
