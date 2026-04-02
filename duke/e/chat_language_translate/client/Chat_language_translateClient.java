@@ -12,7 +12,6 @@ import net.minecraft.text.Text;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.text.Styling;
 
 public class Chat_language_translateClient implements ClientModInitializer {
    public static final Map<String, String> TRANSLATION_CACHE = new ConcurrentHashMap();
