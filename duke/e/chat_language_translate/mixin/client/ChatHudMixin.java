@@ -22,7 +22,7 @@ public class ChatHudMixin {
       cancellable = true
    )
    private void onAddMessage(Text message, CallbackInfo ci) {
-      if (!ModConfig.get().modEnabled) {
+      if (!ModConfig.get().modEnabled || !ModConfig.get().autoTranslate) {
          return;
       }
 
@@ -41,9 +41,10 @@ public class ChatHudMixin {
       String playerName = client.getSession().getUsername();
       boolean isSentMessage = rawText.startsWith("<" + playerName + ">");
 
-      // Traduction des messages ENVOYÉS
-      if (isSentMessage && ModConfig.get().translateSentMessages) {
-         String targetLang = ModConfig.get().sentLanguage.getCode();
+      String targetLang;
+      if (isSentMessage) {
+         // Messages envoyés
+         targetLang = ModConfig.get().sentLanguage.getCode();
          String messageContent = rawText.substring(rawText.indexOf(">") + 1).trim();
 
          TranslationService.translate(messageContent, targetLang).thenAccept((result) -> {
@@ -60,10 +61,9 @@ public class ChatHudMixin {
                }
             }
          });
-      }
-      // Traduction des messages REÇUS
-      else if (!isSentMessage && ModConfig.get().autoTranslate) {
-         String targetLang = ModConfig.get().primaryLanguage.getCode();
+      } else {
+         // Messages reçus
+         targetLang = ModConfig.get().primaryLanguage.getCode();
 
          TranslationService.translate(rawText, targetLang).thenAccept((result) -> {
             if (result != null) {
@@ -75,7 +75,7 @@ public class ChatHudMixin {
                      String normalizedTarget = targetLang.split("-")[0].toLowerCase().trim();
                      if (!normalizedDetected.equals(normalizedTarget)) {
                         MutableText translationText = Text.literal(TRANSLATION_PREFIX + translated)
-                           .setStyle(Style.EMPTY.withItalic(true).withColor(0xFF00));
+                           .setStyle(Style.EMPTY.withItalic(true).withColor(0xFFFF00));
 
                         client.execute(() -> {
                            if (client.inGameHud != null) {
