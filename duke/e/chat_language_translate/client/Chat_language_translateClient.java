@@ -8,6 +8,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
+import net.fabricmc.fabric.api.client.message.v1.ClientSendMessageEvents;
 import net.minecraft.text.Text;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
@@ -27,6 +28,35 @@ public class Chat_language_translateClient implements ClientModInitializer {
                .setStyle(Style.EMPTY.withColor(0x00FF00));
             client.inGameHud.getChatHud().addMessage(startMsg);
          }
+      });
+
+      // INTERCEPTER LES MESSAGES ENVOYÉS
+      ClientSendMessageEvents.ALLOW_COMMAND.register((message) -> {
+         if (ModConfig.get().modEnabled && ModConfig.get().autoTranslate) {
+            // Ne pas traduire si c'est une commande
+            if (message.startsWith("/")) {
+               return true;
+            }
+
+            sendDebug("📤 Message ENVOYÉ: " + message);
+            String targetLang = ModConfig.get().sentLanguage.getCode();
+
+            TranslationService.translate(message, targetLang).thenAccept((result) -> {
+               if (result != null && result.translatedText() != null && !result.translatedText().isBlank()) {
+                  sendDebug("✅ Traduction envoyée: " + result.translatedText());
+                  MutableText translatedMsg = Text.literal("🌐 " + result.translatedText())
+                     .setStyle(Style.EMPTY.withItalic(true).withColor(0x00FF00));
+
+                  MinecraftClient client = MinecraftClient.getInstance();
+                  client.execute(() -> {
+                     if (client.inGameHud != null) {
+                        client.inGameHud.getChatHud().addMessage(translatedMsg);
+                     }
+                  });
+               }
+            });
+         }
+         return true;
       });
 
       ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
@@ -54,6 +84,18 @@ public class Chat_language_translateClient implements ClientModInitializer {
                return 1;
             }
          })));
+      });
+   }
+
+   private static void sendDebug(String msg) {
+      if (!ModConfig.get().debugMode) return;
+      MinecraftClient client = MinecraftClient.getInstance();
+      client.execute(() -> {
+         if (client.inGameHud != null) {
+            MutableText debugMsg = Text.literal("[DEBUG] " + msg)
+               .setStyle(Style.EMPTY.withColor(0xFF00FF));
+            client.inGameHud.getChatHud().addMessage(debugMsg);
+         }
       });
    }
 }
