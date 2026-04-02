@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "chat_language_translate",
-  "version": "1",
+  "version": "1.0.0",
   "name": "Chat Language Translate",
   "description": "Translates incoming chat messages to your configured primary language.",
   "authors": [],
@@ -33,7 +33,9 @@
   "depends": {
     "fabricloader": ">=0.18.4",
     "fabric-api": "*",
-    "minecraft": ">=1.21",
+    "minecraft": "1.21.1"
+  },
+  "suggests": {
     "modmenu": "*"
   }
 }
