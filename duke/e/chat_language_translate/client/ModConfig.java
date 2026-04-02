@@ -17,12 +17,16 @@ public class ModConfig {
    public boolean modEnabled;
    public boolean autoTranslate;
    public String buttonText;
+   public boolean translateSentMessages;
+   public ModConfig.Language sentLanguage;
 
    public ModConfig() {
       this.primaryLanguage = ModConfig.Language.TURKISH;
       this.modEnabled = true;
       this.autoTranslate = false;
       this.buttonText = "[Çevir]";
+      this.translateSentMessages = false;
+      this.sentLanguage = ModConfig.Language.TURKISH;
    }
 
    public static ModConfig get() {
