@@ -42,30 +42,30 @@ public class ModMenuIntegration implements ModMenuApi {
             this.tempEnabled = !this.tempEnabled;
             btn.setMessage(Text.literal("Mod Enabled: " + (this.tempEnabled ? "ON" : "OFF")));
          }).dimensions(centerX - 100, startY, 200, 20).build();
-         this.addRenderableWidget(this.toggleEnabledBtn);
+         this.addDrawableChild(this.toggleEnabledBtn);
          this.toggleAutoBtn = ButtonWidget.builder(Text.literal("Mode: " + (this.tempAuto ? "Auto Translate" : "Translate Button")), (btn) -> {
             this.tempAuto = !this.tempAuto;
             btn.setMessage(Text.literal("Mode: " + (this.tempAuto ? "Auto Translate" : "Translate Button")));
          }).dimensions(centerX - 100, startY + 25, 200, 20).build();
-         this.addRenderableWidget(this.toggleAutoBtn);
+         this.addDrawableChild(this.toggleAutoBtn);
          this.langToggleBtn = ButtonWidget.builder(Text.literal("Primary Lang: " + this.tempLang.toString()), (btn) -> {
             ModConfig.Language oldLang = this.tempLang;
             int nextIdx = (this.tempLang.ordinal() + 1) % ModConfig.Language.values().length;
             this.tempLang = ModConfig.Language.values()[nextIdx];
             btn.setMessage(Text.literal("Primary Lang: " + this.tempLang.toString()));
-            if (this.btnTextField.getValue().equals(oldLang.getDefaultButtonText())) {
-               this.btnTextField.setValue(this.tempLang.getDefaultButtonText());
+            if (this.btnTextField.getText().equals(oldLang.getDefaultButtonText())) {
+               this.btnTextField.setText(this.tempLang.getDefaultButtonText());
             }
 
          }).dimensions(centerX - 100, startY + 50, 200, 20).build();
-         this.addRenderableWidget(this.langToggleBtn);
+         this.addDrawableChild(this.langToggleBtn);
          this.btnTextField = new TextFieldWidget(this.textRenderer, centerX - 100, startY + 85, 200, 20, Text.literal("Button Text"));
          this.btnTextField.setMaxLength(20);
-         this.btnTextField.setValue(ModConfig.get().buttonText);
-         this.addRenderableWidget(this.btnTextField);
-         this.addRenderableWidget(ButtonWidget.builder(Text.literal("Save"), (btn) -> {
+         this.btnTextField.setText(ModConfig.get().buttonText);
+         this.addDrawableChild(this.btnTextField);
+         this.addDrawableChild(ButtonWidget.builder(Text.literal("Save"), (btn) -> {
             ModConfig.get().primaryLanguage = this.tempLang;
-            String valBtn = this.btnTextField.getValue().trim();
+            String valBtn = this.btnTextField.getText().trim();
             if (!valBtn.isEmpty()) {
                ModConfig.get().buttonText = valBtn;
             }
@@ -75,7 +75,7 @@ public class ModMenuIntegration implements ModMenuApi {
             ModConfig.save();
             MinecraftClient.getInstance().setScreen(this.parent);
          }).dimensions(centerX - 100, startY + 115, 95, 20).build());
-         this.addRenderableWidget(ButtonWidget.builder(Text.literal("Cancel"), (btn) -> {
+         this.addDrawableChild(ButtonWidget.builder(Text.literal("Cancel"), (btn) -> {
             MinecraftClient.getInstance().setScreen(this.parent);
          }).dimensions(centerX + 5, startY + 115, 95, 20).build());
       }
