@@ -21,11 +21,9 @@ public class ModMenuIntegration implements ModMenuApi {
       private ButtonWidget toggleEnabledBtn;
       private ButtonWidget toggleAutoBtn;
       private ButtonWidget receivedLangBtn;
-      private ButtonWidget translateSentBtn;
       private ButtonWidget sentLangBtn;
       private boolean tempEnabled;
       private boolean tempAuto;
-      private boolean tempTranslateSent;
       private ModConfig.Language tempReceivedLang;
       private ModConfig.Language tempSentLang;
 
@@ -33,7 +31,6 @@ public class ModMenuIntegration implements ModMenuApi {
          super(Text.literal("Chat Language Translate — Config"));
          this.tempEnabled = ModConfig.get().modEnabled;
          this.tempAuto = ModConfig.get().autoTranslate;
-         this.tempTranslateSent = ModConfig.get().translateSentMessages;
          this.tempReceivedLang = ModConfig.get().primaryLanguage;
          this.tempSentLang = ModConfig.get().sentLanguage;
          this.parent = parent;
@@ -41,7 +38,7 @@ public class ModMenuIntegration implements ModMenuApi {
 
       protected void init() {
          int centerX = this.width / 2;
-         int startY = this.height / 2 - 60;
+         int startY = this.height / 2 - 40;
 
          // Mod Enabled
          this.toggleEnabledBtn = ButtonWidget.builder(Text.literal("Mod Enabled: " + (this.tempEnabled ? "ON" : "OFF")), (btn) -> {
@@ -65,19 +62,12 @@ public class ModMenuIntegration implements ModMenuApi {
          }).dimensions(centerX - 100, startY + 50, 200, 20).build();
          this.addDrawableChild(this.receivedLangBtn);
 
-         // Translate Sent Messages
-         this.translateSentBtn = ButtonWidget.builder(Text.literal("Traduire msgs envoyés: " + (this.tempTranslateSent ? "ON" : "OFF")), (btn) -> {
-            this.tempTranslateSent = !this.tempTranslateSent;
-            btn.setMessage(Text.literal("Traduire msgs envoyés: " + (this.tempTranslateSent ? "ON" : "OFF")));
-         }).dimensions(centerX - 100, startY + 75, 200, 20).build();
-         this.addDrawableChild(this.translateSentBtn);
-
          // Sent Messages Language
          this.sentLangBtn = ButtonWidget.builder(Text.literal("Langue msgs envoyés: " + this.tempSentLang.toString()), (btn) -> {
             int nextIdx = (this.tempSentLang.ordinal() + 1) % ModConfig.Language.values().length;
             this.tempSentLang = ModConfig.Language.values()[nextIdx];
             btn.setMessage(Text.literal("Langue msgs envoyés: " + this.tempSentLang.toString()));
-         }).dimensions(centerX - 100, startY + 100, 200, 20).build();
+         }).dimensions(centerX - 100, startY + 75, 200, 20).build();
          this.addDrawableChild(this.sentLangBtn);
 
          // Save Button
@@ -85,21 +75,20 @@ public class ModMenuIntegration implements ModMenuApi {
             ModConfig.get().modEnabled = this.tempEnabled;
             ModConfig.get().autoTranslate = this.tempAuto;
             ModConfig.get().primaryLanguage = this.tempReceivedLang;
-            ModConfig.get().translateSentMessages = this.tempTranslateSent;
             ModConfig.get().sentLanguage = this.tempSentLang;
             ModConfig.save();
             MinecraftClient.getInstance().setScreen(this.parent);
-         }).dimensions(centerX - 100, startY + 140, 95, 20).build());
+         }).dimensions(centerX - 100, startY + 110, 95, 20).build());
 
          // Cancel Button
          this.addDrawableChild(ButtonWidget.builder(Text.literal("Cancel"), (btn) -> {
             MinecraftClient.getInstance().setScreen(this.parent);
-         }).dimensions(centerX + 5, startY + 140, 95, 20).build());
+         }).dimensions(centerX + 5, startY + 110, 95, 20).build());
       }
 
       public void render(DrawContext context, int mouseX, int mouseY, float delta) {
          super.render(context, mouseX, mouseY, delta);
-         context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, this.height / 2 - 90, 16777215);
+         context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, this.height / 2 - 70, 16777215);
       }
 
       public boolean shouldCloseOnEsc() {
