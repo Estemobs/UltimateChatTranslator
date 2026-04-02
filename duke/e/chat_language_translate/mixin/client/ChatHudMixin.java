@@ -6,6 +6,8 @@ import duke.e.chat_language_translate.client.TranslationService;
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import net.minecraft.text.ClickEvent;
+import net.minecraft.text.HoverEvent;
 import net.minecraft.class_124;
 import net.minecraft.class_2561;
 import net.minecraft.class_2583;
@@ -14,8 +16,6 @@ import net.minecraft.class_338;
 import net.minecraft.class_5250;
 import net.minecraft.class_7469;
 import net.minecraft.class_7591;
-import net.minecraft.class_2558.class_10609;
-import net.minecraft.class_2568.class_10613;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -75,7 +75,7 @@ public class ChatHudMixin {
                      var10000 = String.valueOf(rawText.hashCode());
                      String cacheKey = var10000 + "_" + System.currentTimeMillis();
                      Chat_language_translateClient.TRANSLATION_CACHE.put(cacheKey, rawText);
-                     class_5250 button = class_2561.method_43470(" " + btnText).method_10862(class_2583.field_24360.method_10977(class_124.field_1065).method_10958(new class_10609("/clt_translate " + cacheKey)).method_10949(new class_10613(class_2561.method_43470(targetLangEnum.getHoverText()))));
+                     class_5250 button = class_2561.method_43470(" " + btnText).method_10862(class_2583.field_24360.method_10977(class_124.field_1065).method_10958(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/clt_translate " + cacheKey)).method_10949(new HoverEvent(HoverEvent.Action.SHOW_TEXT, class_2561.method_43470(targetLangEnum.getHoverText()))));
                      if (!PENDING.contains("mod_" + msgKey)) {
                         PENDING.add("mod_" + msgKey);
                         ci.cancel();
