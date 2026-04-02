@@ -22,8 +22,10 @@ public class ModMenuIntegration implements ModMenuApi {
       private ButtonWidget toggleAutoBtn;
       private ButtonWidget receivedLangBtn;
       private ButtonWidget sentLangBtn;
+      private ButtonWidget debugBtn;
       private boolean tempEnabled;
       private boolean tempAuto;
+      private boolean tempDebug;
       private ModConfig.Language tempReceivedLang;
       private ModConfig.Language tempSentLang;
 
@@ -31,6 +33,7 @@ public class ModMenuIntegration implements ModMenuApi {
          super(Text.literal("Chat Language Translate — Config"));
          this.tempEnabled = ModConfig.get().modEnabled;
          this.tempAuto = ModConfig.get().autoTranslate;
+         this.tempDebug = ModConfig.get().debugMode;
          this.tempReceivedLang = ModConfig.get().primaryLanguage;
          this.tempSentLang = ModConfig.get().sentLanguage;
          this.parent = parent;
@@ -38,7 +41,7 @@ public class ModMenuIntegration implements ModMenuApi {
 
       protected void init() {
          int centerX = this.width / 2;
-         int startY = this.height / 2 - 40;
+         int startY = this.height / 2 - 50;
 
          // Mod Enabled
          this.toggleEnabledBtn = ButtonWidget.builder(Text.literal("Mod Enabled: " + (this.tempEnabled ? "ON" : "OFF")), (btn) -> {
@@ -70,25 +73,33 @@ public class ModMenuIntegration implements ModMenuApi {
          }).dimensions(centerX - 100, startY + 75, 200, 20).build();
          this.addDrawableChild(this.sentLangBtn);
 
+         // Debug Mode
+         this.debugBtn = ButtonWidget.builder(Text.literal("Debug: " + (this.tempDebug ? "ON" : "OFF")), (btn) -> {
+            this.tempDebug = !this.tempDebug;
+            btn.setMessage(Text.literal("Debug: " + (this.tempDebug ? "ON" : "OFF")));
+         }).dimensions(centerX - 100, startY + 100, 200, 20).build();
+         this.addDrawableChild(this.debugBtn);
+
          // Save Button
          this.addDrawableChild(ButtonWidget.builder(Text.literal("Save"), (btn) -> {
             ModConfig.get().modEnabled = this.tempEnabled;
             ModConfig.get().autoTranslate = this.tempAuto;
             ModConfig.get().primaryLanguage = this.tempReceivedLang;
             ModConfig.get().sentLanguage = this.tempSentLang;
+            ModConfig.get().debugMode = this.tempDebug;
             ModConfig.save();
             MinecraftClient.getInstance().setScreen(this.parent);
-         }).dimensions(centerX - 100, startY + 110, 95, 20).build());
+         }).dimensions(centerX - 100, startY + 135, 95, 20).build());
 
          // Cancel Button
          this.addDrawableChild(ButtonWidget.builder(Text.literal("Cancel"), (btn) -> {
             MinecraftClient.getInstance().setScreen(this.parent);
-         }).dimensions(centerX + 5, startY + 110, 95, 20).build());
+         }).dimensions(centerX + 5, startY + 135, 95, 20).build());
       }
 
       public void render(DrawContext context, int mouseX, int mouseY, float delta) {
          super.render(context, mouseX, mouseY, delta);
-         context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, this.height / 2 - 70, 16777215);
+         context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, this.height / 2 - 80, 16777215);
       }
 
       public boolean shouldCloseOnEsc() {
