@@ -17,10 +17,6 @@ repositories {
     }
 }
 
-loom {
-    splitEnvironmentSourceSets()
-}
-
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
@@ -32,11 +28,19 @@ dependencies {
 sourceSets {
     main {
         java {
-            srcDirs = ['duke']
+            srcDirs = ['src/main/java', 'duke']
         }
         resources {
-            srcDirs = ['.']
-            exclude 'duke/**'
+            srcDirs = ['src/main/resources', '.']
+            exclude 'src/**', 'duke/**', '.gradle/**', 'build/**', 'gradle/**', '.git/**'
+        }
+    }
+    client {
+        java {
+            srcDirs = ['src/client/java', 'duke']
+        }
+        resources {
+            srcDirs = ['src/client/resources']
         }
     }
 }
