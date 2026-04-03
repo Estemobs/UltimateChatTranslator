@@ -7,7 +7,6 @@
   "authors": [],
   "contact": {},
   "license": "All-Rights-Reserved",
-  "icon": "assets/chat_language_translate/icon.png",
   "environment": "*",
   "entrypoints": {
     "client": [
