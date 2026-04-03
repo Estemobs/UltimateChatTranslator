@@ -58,6 +58,90 @@ install_with_apt() {
     sudo apt install -y "$package"
 }
 
+version_ge() {
+    # Retourne vrai si $1 >= $2
+    [ "$(printf '%s\n' "$1" "$2" | sort -V | head -n1)" = "$2" ]
+}
+
+gradle_version() {
+    "$1" -v 2>/dev/null | awk '/^Gradle / {print $2; exit}'
+}
+
+ensure_unzip() {
+    if command -v unzip >/dev/null 2>&1; then
+        return
+    fi
+
+    echo -e "${YELLOW}→${NC} unzip manquant, installation en cours..."
+    detect_distro
+
+    if is_arch_based; then
+        install_with_pacman "unzip"
+    elif is_debian_based; then
+        install_with_apt "unzip"
+    else
+        echo -e "${RED}✗ Impossible d'installer unzip automatiquement sur ${DISTRO_ID}.${NC}"
+        exit 1
+    fi
+}
+
+ensure_gradle_compatible() {
+    local min_required="8.6"
+    local bundled_version="8.8"
+    local gradle_cmd=""
+
+    if command -v gradle >/dev/null 2>&1; then
+        local system_version
+        system_version=$(gradle_version "gradle")
+        if [ -n "$system_version" ] && version_ge "$system_version" "$min_required"; then
+            echo -e "${GREEN}✓ Gradle systeme${NC} compatible (${system_version})"
+            GRADLE_CMD="gradle"
+            return
+        fi
+        if [ -n "$system_version" ]; then
+            echo -e "${YELLOW}→${NC} Gradle systeme trop ancien (${system_version}), minimum ${min_required}"
+        else
+            echo -e "${YELLOW}→${NC} Version Gradle systeme introuvable, fallback local"
+        fi
+    else
+        echo -e "${YELLOW}→${NC} Gradle systeme absent, fallback local"
+    fi
+
+    ensure_unzip
+
+    local gradle_dir=".gradle-bin/gradle-${bundled_version}"
+    local gradle_zip=".gradle-bin/gradle-${bundled_version}-bin.zip"
+    local gradle_url="https://services.gradle.org/distributions/gradle-${bundled_version}-bin.zip"
+    local local_cmd="${gradle_dir}/bin/gradle"
+
+    mkdir -p .gradle-bin
+
+    if [ ! -x "$local_cmd" ]; then
+        echo -e "${YELLOW}→${NC} Telechargement de Gradle ${bundled_version}..."
+        if command -v curl >/dev/null 2>&1; then
+            curl -fsSL "$gradle_url" -o "$gradle_zip"
+        elif command -v wget >/dev/null 2>&1; then
+            wget -qO "$gradle_zip" "$gradle_url"
+        else
+            echo -e "${RED}✗ curl ou wget requis pour telecharger Gradle.${NC}"
+            exit 1
+        fi
+
+        echo -e "${YELLOW}→${NC} Extraction de Gradle ${bundled_version}..."
+        unzip -qo "$gradle_zip" -d .gradle-bin
+    fi
+
+    local local_version
+    local_version=$(gradle_version "$local_cmd")
+    if [ -z "$local_version" ] || ! version_ge "$local_version" "$min_required"; then
+        echo -e "${RED}✗ Gradle local invalide (${local_version:-inconnu}).${NC}"
+        exit 1
+    fi
+
+    echo -e "${GREEN}✓ Gradle local${NC} pret (${local_version})"
+    GRADLE_CMD="$local_cmd"
+}
+
 ensure_java_21() {
     if command -v java >/dev/null 2>&1; then
         local java_major
@@ -96,13 +180,24 @@ fi
 JAVA_VERSION=$(java -version 2>&1 | head -1)
 echo -e "${GREEN}✓ Java:${NC} $JAVA_VERSION"
 
-# Check Gradle Wrapper
-echo -e "${YELLOW}→${NC} Cherchant Gradle Wrapper..."
-if [ ! -f "gradle/wrapper/gradle-wrapper.jar" ]; then
-    echo -e "${RED}✗ Erreur: Gradle wrapper non trouvé!${NC}"
-    exit 1
+# Check build tool
+echo -e "${YELLOW}→${NC} Verification de l'outil Gradle..."
+if [ -f "gradle/wrapper/gradle-wrapper.jar" ]; then
+    BUILD_CMD="java -classpath gradle/wrapper/gradle-wrapper.jar org.gradle.wrapper.GradleWrapperMain"
+    echo -e "${GREEN}✓ Gradle Wrapper${NC} detecte"
+else
+    echo -e "${YELLOW}→${NC} Gradle Wrapper absent, preparation d'un Gradle compatible"
+    ensure_gradle_compatible
+    echo -e "${YELLOW}→${NC} Generation du Gradle Wrapper (8.8)..."
+    "$GRADLE_CMD" wrapper --gradle-version 8.8 --distribution-type bin || true
+    if [ -f "gradle/wrapper/gradle-wrapper.jar" ]; then
+        BUILD_CMD="java -classpath gradle/wrapper/gradle-wrapper.jar org.gradle.wrapper.GradleWrapperMain"
+        echo -e "${GREEN}✓ Gradle Wrapper${NC} genere"
+    else
+        BUILD_CMD="$GRADLE_CMD"
+        echo -e "${YELLOW}→${NC} Wrapper non genere, utilisation de Gradle compatible"
+    fi
 fi
-echo -e "${GREEN}✓ Gradle Wrapper${NC} trouvé (8.8)"
 
 # Clean option
 if [ "$1" == "clean" ]; then
@@ -113,7 +208,7 @@ fi
 
 # Build
 echo -e "${YELLOW}→${NC} Compilation en cours..."
-java -classpath gradle/wrapper/gradle-wrapper.jar org.gradle.wrapper.GradleWrapperMain build
+$BUILD_CMD build
 
 # Final check
 echo ""
