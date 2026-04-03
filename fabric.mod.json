@@ -21,7 +21,6 @@
     ]
   },
   "mixins": [
-    "chat_language_translate.mixins.json",
     {
       "config": "chat_language_translate.client.mixins.json",
       "environment": "client"
