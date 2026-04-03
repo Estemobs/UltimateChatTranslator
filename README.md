@@ -7,6 +7,10 @@ Mod Fabric client (Minecraft 1.21.1) pour traduire les messages du chat.
 Le script [build.sh](build.sh) :
 - verifie Java 21
 - installe automatiquement Java 21 si manquant (Arch ou Debian/Ubuntu)
+- utilise le Gradle Wrapper s'il existe
+- sinon detecte la version Gradle
+- si version < 8.6 (ex: 4.4.1 sur certains Debian/Ubuntu), telecharge Gradle 8.8 en local
+- tente de generer le Wrapper 8.8, puis build
 - lance la compilation Gradle
 
 Commandes:

@@ -1,5 +1,6 @@
 # Gradle
 .gradle/
+.gradle-bin/
 build/
 gradle/
 gradlew
@@ -21,3 +22,7 @@ Thumbs.db
 # Misc
 *.log
 *.tmp
+*.swp
+*.swo
+out/
+run/
