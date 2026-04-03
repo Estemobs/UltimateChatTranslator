@@ -41,37 +41,76 @@ public class ChatHudMixin {
             return;
          }
 
-         // TOUJOURS afficher le format du message
-         sendDebug("📨 Message: '" + rawText + "'");
-
          if (!ModConfig.get().autoTranslate) {
             return;
          }
 
-         // On traduit TOUT automatiquement
-         String targetLang = ModConfig.get().primaryLanguage.getCode();
+         // Détecter si c'est un message envoyé par le joueur
+         MinecraftClient client = MinecraftClient.getInstance();
+         String playerName = client.getSession().getUsername();
+         boolean isSentMessage = rawText.startsWith("<" + playerName + ">");
 
-         sendDebug("Traduction vers: " + targetLang);
+         String targetLang;
+         if (isSentMessage) {
+            // Messages envoyés
+            targetLang = ModConfig.get().sentLanguage.getCode();
+            String messageContent = rawText.substring(rawText.indexOf(">") + 1).trim();
 
-         TranslationService.translate(rawText, targetLang).thenAccept((result) -> {
-            if (result != null && result.translatedText() != null && !result.translatedText().isBlank()) {
-               sendDebug("✅ Résultat: " + result.translatedText());
-               MutableText translatedMsg = Text.literal(TRANSLATION_PREFIX + result.translatedText())
-                  .setStyle(Style.EMPTY.withItalic(true).withColor(0xFFFF00));
+            sendDebug("📤 Message ENVOYÉ: " + messageContent);
+            sendDebug("Traduction vers: " + targetLang);
 
-               MinecraftClient client = MinecraftClient.getInstance();
-               client.execute(() -> {
-                  if (client.inGameHud != null) {
-                     client.inGameHud.getChatHud().addMessage(translatedMsg);
+            TranslationService.translate(messageContent, targetLang).thenAccept((result) -> {
+               if (result != null && result.translatedText() != null && !result.translatedText().isBlank()) {
+                  if (!result.translatedText().equalsIgnoreCase(messageContent)) {
+                     sendDebug("✅ Résultat envoyé: " + result.translatedText());
+                     MutableText translatedMsg = Text.literal(TRANSLATION_PREFIX + result.translatedText())
+                        .setStyle(Style.EMPTY.withItalic(true).withColor(0x00FF00));
+
+                     client.execute(() -> {
+                        if (client.inGameHud != null) {
+                           client.inGameHud.getChatHud().addMessage(translatedMsg);
+                        }
+                     });
                   }
-               });
-            } else {
-               sendDebug("❌ Résultat vide ou null!");
-            }
-         }).exceptionally((error) -> {
-            sendDebug("❌ ERREUR: " + error.getMessage());
-            return null;
-         });
+               }
+            }).exceptionally((error) -> {
+               sendDebug("❌ ERREUR envoyé: " + error.getMessage());
+               return null;
+            });
+         } else {
+            // Messages reçus
+            targetLang = ModConfig.get().primaryLanguage.getCode();
+
+            sendDebug("📥 Message REÇU: " + rawText);
+            sendDebug("Traduction vers: " + targetLang);
+
+            TranslationService.translate(rawText, targetLang).thenAccept((result) -> {
+               if (result != null) {
+                  String detected = result.detectedLang();
+                  String translated = result.translatedText();
+                  if (detected != null && translated != null && !translated.isBlank()) {
+                     if (!translated.equalsIgnoreCase(rawText)) {
+                        String normalizedDetected = detected.split("-")[0].toLowerCase().trim();
+                        String normalizedTarget = targetLang.split("-")[0].toLowerCase().trim();
+                        if (!normalizedDetected.equals(normalizedTarget)) {
+                           sendDebug("✅ Résultat reçu: " + translated);
+                           MutableText translationText = Text.literal(TRANSLATION_PREFIX + translated)
+                              .setStyle(Style.EMPTY.withItalic(true).withColor(0xFFFF00));
+
+                           client.execute(() -> {
+                              if (client.inGameHud != null) {
+                                 client.inGameHud.getChatHud().addMessage(translationText);
+                              }
+                           });
+                        }
+                     }
+                  }
+               }
+            }).exceptionally((error) -> {
+               sendDebug("❌ ERREUR reçu: " + error.getMessage());
+               return null;
+            });
+         }
 
       } catch (Exception e) {
          sendDebug("🚨 EXCEPTION: " + e.getClass().getSimpleName() + " - " + e.getMessage());
