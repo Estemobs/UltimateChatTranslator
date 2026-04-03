@@ -1,104 +1,64 @@
-# Chat Language Translate - Guide Installation Linux
+# Chat Language Translate
 
-## ⚙️ Prérequis
+Mod Fabric client (Minecraft 1.21.1) pour traduire les messages du chat.
 
-### Java 21
+## Build rapide (Arch ou Debian/Ubuntu)
+
+Le script [build.sh](build.sh) :
+- verifie Java 21
+- installe automatiquement Java 21 si manquant (Arch ou Debian/Ubuntu)
+- lance la compilation Gradle
+
+Commandes:
+
 ```bash
-# Arch Linux
+chmod +x build.sh
+./build.sh
+```
+
+Build propre:
+
+```bash
+./build.sh clean
+```
+
+Le JAR genere se trouve dans:
+
+```bash
+build/libs/chat_language_translate-1.0.0.jar
+```
+
+## Installation manuelle (optionnel)
+
+Si tu preferes installer Java toi-meme:
+
+Arch Linux:
+
+```bash
 sudo pacman -S jdk21-openjdk
-
-# Debian/Ubuntu
-sudo apt install openjdk-21-jdk
-
-# Vérifier l'installation
-java -version
 ```
 
-**Gradle 8.8** est téléchargé automatiquement par le wrapper. Aucune installation manuelle requise.
+Debian/Ubuntu:
 
----
-
-## 🚀 Installation du projet
-
-### 1. Cloner le repository
 ```bash
-git clone <repository-url>
-cd ChatLanguageTranslate
+sudo apt update
+sudo apt install -y openjdk-21-jdk
 ```
 
-### 2. Compiler le projet
+Puis build classique:
+
 ```bash
 ./gradlew build
 ```
 
-**Notes:**
-- La première compilation prend plusieurs minutes (télécharge Gradle 8.8, Minecraft, dépendances)
-- Gradle va aussi générer/remapper les sources Minecraft automatiquement
+## Utilisation du mod
 
-### 3. Récupérer le JAR compilé
-```bash
-ls build/libs/
-```
+1. Copier le JAR dans le dossier mods de Minecraft.
+2. Lancer Minecraft avec Fabric 1.21.1.
+3. Configurer le mod via son interface/config.
 
-Le fichier JAR est: `chat_language_translate-1.0.0.jar`
+## Depannage
 
----
-
-## 📖 À propos du mod
-
-Chat Language Translate est un mod Fabric client pour Minecraft 1.21.1 qui:
-- Intercepte les messages du chat entrants
-- Peut les traduire automatiquement ou afficher un bouton de traduction
-- Enregistre la configuration dans `config/chat_language_translate.json`
-
----
-
-## 🔧 Dépannage
-
-### "java: command not found"
-Installer Java 21 (voir section Prérequis)
-
-### Erreurs de compilation au premier build
-C'est normal. Relancer:
-```bash
-./gradlew clean build
-```
-
-### Réinitialiser complètement
-```bash
-rm -rf build .gradle
-./gradlew build
-```
-
----
-
-## 📦 Versions utilisées
-
-| Composant | Version |
-|-----------|---------|
-| Java | 21 |
-| Gradle | 8.8 |
-| Minecraft | 1.21.1 |
-| Fabric Loader | 0.18.6 |
-| Fabric API | 0.116.8+1.21.1 |
-| Yarn Mappings | 1.21.1+build.1 |
-
----
-
-## 📁 Structure du projet
-
-```
-.
-├── build.gradle              # Configuration Gradle
-├── gradle.properties         # Versions dépendances
-├── gradlew / gradle/wrapper/ # Gradle wrapper
-├── duke/e/chat_language_translate/
-│   ├── Chat_language_translate.java
-│   ├── client/
-│   │   ├── Chat_language_translateClient.java
-│   │   ├── ModConfig.java
-│   │   └── TranslationService.java
-│   └── mixin/client/ChatHudMixin.java
-├── assets/                   # Ressources
-└── fabric.mod.json          # Config Fabric
-```
+- Si le script demande sudo, entre ton mot de passe pour installer les dependances.
+- Si un build echoue au premier essai, relance `./build.sh`.
+- En cas de cache corrompu, utilise `./build.sh clean` puis `./build.sh`.
