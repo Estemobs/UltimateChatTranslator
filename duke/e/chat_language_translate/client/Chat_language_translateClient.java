@@ -9,6 +9,7 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.message.v1.ClientSendMessageEvents;
+import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.minecraft.text.Text;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
@@ -38,7 +39,7 @@ public class Chat_language_translateClient implements ClientModInitializer {
                return true;
             }
 
-            sendDebug("📤 Message ENVOYÉ: " + message);
+            sendDebug("📤 Message ENVOYÉ (avant): " + message);
             String targetLang = ModConfig.get().sentLanguage.getCode();
 
             TranslationService.translate(message, targetLang).thenAccept((result) -> {
@@ -57,6 +58,95 @@ public class Chat_language_translateClient implements ClientModInitializer {
             });
          }
          return true;
+      });
+
+      // INTERCEPTER LES MESSAGES REÇUS (inclus ceux du joueur qui reviennent du serveur)
+      ClientReceiveMessageEvents.GAME.register((message, signedContentPresent) -> {
+         if (!ModConfig.get().modEnabled || !ModConfig.get().autoTranslate) {
+            return;
+         }
+
+         String rawText = message.getString();
+
+         // Éviter la boucle infinie
+         if (rawText != null && rawText.startsWith("🌐 ")) {
+            return;
+         }
+
+         if (rawText != null && rawText.startsWith("[DEBUG]")) {
+            return;
+         }
+
+         if (rawText == null || rawText.isBlank()) {
+            return;
+         }
+
+         // Détecter si c'est un message envoyé par le joueur
+         MinecraftClient client = MinecraftClient.getInstance();
+         String playerName = client.getSession().getUsername();
+         boolean isSentMessage = rawText.startsWith("<" + playerName + ">");
+
+         String targetLang;
+         if (isSentMessage) {
+            // Messages envoyés (qui reviennent du serveur)
+            targetLang = ModConfig.get().sentLanguage.getCode();
+            String messageContent = rawText.substring(rawText.indexOf(">") + 1).trim();
+
+            sendDebug("📥 Message RENVOYÉ (du serveur): " + messageContent);
+            sendDebug("Traduction vers: " + targetLang);
+
+            TranslationService.translate(messageContent, targetLang).thenAccept((result) -> {
+               if (result != null && result.translatedText() != null && !result.translatedText().isBlank()) {
+                  if (!result.translatedText().equalsIgnoreCase(messageContent)) {
+                     sendDebug("✅ Résultat renvoyé: " + result.translatedText());
+                     MutableText translatedMsg = Text.literal("🌐 " + result.translatedText())
+                        .setStyle(Style.EMPTY.withItalic(true).withColor(0x00FF00));
+
+                     client.execute(() -> {
+                        if (client.inGameHud != null) {
+                           client.inGameHud.getChatHud().addMessage(translatedMsg);
+                        }
+                     });
+                  }
+               }
+            }).exceptionally((error) -> {
+               sendDebug("❌ ERREUR renvoyé: " + error.getMessage());
+               return null;
+            });
+         } else {
+            // Messages reçus (autres joueurs)
+            targetLang = ModConfig.get().primaryLanguage.getCode();
+
+            sendDebug("📥 Message REÇU: " + rawText);
+            sendDebug("Traduction vers: " + targetLang);
+
+            TranslationService.translate(rawText, targetLang).thenAccept((result) -> {
+               if (result != null) {
+                  String detected = result.detectedLang();
+                  String translated = result.translatedText();
+                  if (detected != null && translated != null && !translated.isBlank()) {
+                     if (!translated.equalsIgnoreCase(rawText)) {
+                        String normalizedDetected = detected.split("-")[0].toLowerCase().trim();
+                        String normalizedTarget = targetLang.split("-")[0].toLowerCase().trim();
+                        if (!normalizedDetected.equals(normalizedTarget)) {
+                           sendDebug("✅ Résultat reçu: " + translated);
+                           MutableText translationText = Text.literal("🌐 " + translated)
+                              .setStyle(Style.EMPTY.withItalic(true).withColor(0xFFFF00));
+
+                           client.execute(() -> {
+                              if (client.inGameHud != null) {
+                                 client.inGameHud.getChatHud().addMessage(translationText);
+                              }
+                           });
+                        }
+                     }
+                  }
+               }
+            }).exceptionally((error) -> {
+               sendDebug("❌ ERREUR reçu: " + error.getMessage());
+               return null;
+            });
+         }
       });
 
       ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
