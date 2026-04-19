@@ -24,5 +24,10 @@ jobs:
           distribution: temurin
           java-version: "21"
 
+      - name: Setup Gradle 8.8
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: 8.8
+
       - name: Run tests
-        run: java -classpath gradle/wrapper/gradle-wrapper.jar org.gradle.wrapper.GradleWrapperMain test
+        run: gradle test
