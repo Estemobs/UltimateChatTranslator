@@ -32,6 +32,13 @@ Le JAR genere se trouve dans:
 build/libs/chat_language_translate-1.0.0.jar
 ```
 
+## Release automatique GitHub
+
+Un workflow GitHub Actions est inclus:
+- declenchement sur tag `v*` (ex: `v1.0.1`) ou manuellement (`workflow_dispatch`)
+- build du mod
+- publication d'une release GitHub avec le `.jar` en piece jointe
+
 ## Installation manuelle (optionnel)
 
 Si tu preferes installer Java toi-meme:
