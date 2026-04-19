@@ -16,6 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class ChatHudMixin {
    private static final String TRANSLATION_PREFIX = "🌐 ";
    private static final String DEBUG_PREFIX = "[DEBUG]";
+   private static final java.util.regex.Pattern LEADING_CHAT_TAGS = java.util.regex.Pattern.compile("^(?:\\[[^\\]]+\\]\\s*)+");
    private static final int SENT_MESSAGE_COLOR = 0x00FF00;
    private static final int RECEIVED_MESSAGE_COLOR = 0xFFFF00;
 
@@ -26,7 +27,7 @@ public class ChatHudMixin {
    )
    private void onAddMessage(Text message, CallbackInfo ci) {
       try {
-         if (!ModConfig.get().modEnabled || !ModConfig.get().autoTranslate) {
+         if (!ModConfig.get().modEnabled) {
             return;
          }
 
@@ -46,30 +47,16 @@ public class ChatHudMixin {
          }
 
          String playerName = client.getSession().getUsername();
-         String playerPrefix = "<" + playerName + ">";
-         String alternativePrefix = playerName + ":";
-         boolean isSentMessage = rawText.startsWith(playerPrefix) || rawText.startsWith(alternativePrefix);
+         String strippedText = stripLeadingTags(rawText).trim();
+         String messageContent = extractSentMessageContent(strippedText, playerName);
+         boolean isSentMessage = messageContent != null;
 
          if (isSentMessage) {
-            String messageContent;
-            if (rawText.startsWith(playerPrefix)) {
-               if (rawText.length() <= playerPrefix.length()) {
-                  return;
-               }
-               messageContent = rawText.substring(playerPrefix.length()).trim();
-            } else if (rawText.startsWith(alternativePrefix)) {
-               if (rawText.length() <= alternativePrefix.length()) {
-                  return;
-               }
-               messageContent = rawText.substring(alternativePrefix.length()).trim();
-            } else {
-               return;
-            }
-
             if (messageContent.isBlank()) {
                return;
             }
-            String targetLang = ModConfig.get().sentLanguage.getCode();
+
+            String targetLang = ModConfig.get().sentLanguage != null ? ModConfig.get().sentLanguage.getCode() : ModConfig.Language.TURKISH.getCode();
             sendDebug("📤 Message ENVOYÉ: " + messageContent);
             sendDebug("Traduction vers: " + targetLang);
 
@@ -101,7 +88,11 @@ public class ChatHudMixin {
             return;
          }
 
-         String targetLang = ModConfig.get().primaryLanguage.getCode();
+         if (!ModConfig.get().autoTranslate) {
+            return;
+         }
+
+         String targetLang = ModConfig.get().primaryLanguage != null ? ModConfig.get().primaryLanguage.getCode() : ModConfig.Language.TURKISH.getCode();
          sendDebug("📥 Message REÇU: " + rawText);
          sendDebug("Traduction vers: " + targetLang);
 
@@ -153,5 +144,31 @@ public class ChatHudMixin {
             client.inGameHud.getChatHud().addMessage(debugMsg);
          }
       });
+   }
+
+   private static String stripLeadingTags(String text) {
+      return LEADING_CHAT_TAGS.matcher(text).replaceFirst("");
+   }
+
+   private static String extractSentMessageContent(String text, String playerName) {
+      String playerPrefix = "<" + playerName + ">";
+      if (text.startsWith(playerPrefix)) {
+         if (text.length() <= playerPrefix.length()) {
+            return "";
+         }
+
+         return text.substring(playerPrefix.length()).trim();
+      }
+
+      String alternativePrefix = playerName + ":";
+      if (text.startsWith(alternativePrefix)) {
+         if (text.length() <= alternativePrefix.length()) {
+            return "";
+         }
+
+         return text.substring(alternativePrefix.length()).trim();
+      }
+
+      return null;
    }
 }

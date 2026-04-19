@@ -45,6 +45,10 @@ public class ModConfig {
                } else if (INSTANCE.primaryLanguage == null) {
                   INSTANCE.primaryLanguage = ModConfig.Language.TURKISH;
                }
+
+               if (INSTANCE.sentLanguage == null) {
+                  INSTANCE.sentLanguage = ModConfig.Language.TURKISH;
+               }
             } catch (Throwable var4) {
                if (reader != null) {
                   try {
