@@ -15,6 +15,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ChatHud.class)
 public class ChatHudMixin {
    private static final String TRANSLATION_PREFIX = "🌐 ";
+   private static final String DEBUG_PREFIX = "[DEBUG]";
+   private static final int SENT_MESSAGE_COLOR = 0x00FF00;
+   private static final int RECEIVED_MESSAGE_COLOR = 0xFFFF00;
 
    @Inject(
       method = "addMessage(Lnet/minecraft/text/Text;)V",
@@ -33,7 +36,7 @@ public class ChatHudMixin {
             return;
          }
 
-         if (rawText.startsWith(TRANSLATION_PREFIX) || rawText.startsWith("[DEBUG]")) {
+         if (rawText.startsWith(TRANSLATION_PREFIX) || rawText.startsWith(DEBUG_PREFIX)) {
             return;
          }
 
@@ -43,10 +46,29 @@ public class ChatHudMixin {
          }
 
          String playerName = client.getSession().getUsername();
-         boolean isSentMessage = rawText.startsWith("<" + playerName + ">");
+         String playerPrefix = "<" + playerName + ">";
+         String alternativePrefix = playerName + ":";
+         boolean isSentMessage = rawText.startsWith(playerPrefix) || rawText.startsWith(alternativePrefix);
 
          if (isSentMessage) {
-            String messageContent = rawText.substring(rawText.indexOf(">") + 1).trim();
+            String messageContent;
+            if (rawText.startsWith(playerPrefix)) {
+               if (rawText.length() <= playerPrefix.length()) {
+                  return;
+               }
+               messageContent = rawText.substring(playerPrefix.length()).trim();
+            } else if (rawText.startsWith(alternativePrefix)) {
+               if (rawText.length() <= alternativePrefix.length()) {
+                  return;
+               }
+               messageContent = rawText.substring(alternativePrefix.length()).trim();
+            } else {
+               return;
+            }
+
+            if (messageContent.isBlank()) {
+               return;
+            }
             String targetLang = ModConfig.get().sentLanguage.getCode();
             sendDebug("📤 Message ENVOYÉ: " + messageContent);
             sendDebug("Traduction vers: " + targetLang);
@@ -59,7 +81,7 @@ public class ChatHudMixin {
 
                   if (result != null && result.translatedText() != null && !result.translatedText().isBlank() && !result.translatedText().equalsIgnoreCase(messageContent)) {
                      sendDebug("✅ Résultat envoyé: " + result.translatedText());
-                     MutableText translatedMsg = Text.literal(TRANSLATION_PREFIX + result.translatedText()).setStyle(Style.EMPTY.withItalic(true).withColor(0x00FF00));
+                     MutableText translatedMsg = Text.literal(TRANSLATION_PREFIX + result.translatedText()).setStyle(Style.EMPTY.withItalic(true).withColor(SENT_MESSAGE_COLOR));
                      client.inGameHud.getChatHud().addMessage(translatedMsg);
                   } else {
                      client.inGameHud.getChatHud().addMessage(message);
@@ -104,7 +126,7 @@ public class ChatHudMixin {
             }
 
             sendDebug("✅ Résultat reçu: " + translated);
-            MutableText translationText = Text.literal(TRANSLATION_PREFIX + translated).setStyle(Style.EMPTY.withItalic(true).withColor(0xFFFF00));
+            MutableText translationText = Text.literal(TRANSLATION_PREFIX + translated).setStyle(Style.EMPTY.withItalic(true).withColor(RECEIVED_MESSAGE_COLOR));
             client.execute(() -> {
                if (client.inGameHud != null) {
                   client.inGameHud.getChatHud().addMessage(translationText);
@@ -127,7 +149,7 @@ public class ChatHudMixin {
       MinecraftClient client = MinecraftClient.getInstance();
       client.execute(() -> {
          if (client.inGameHud != null) {
-            MutableText debugMsg = Text.literal("[DEBUG] " + msg).setStyle(Style.EMPTY.withColor(0xFF00FF));
+            MutableText debugMsg = Text.literal(DEBUG_PREFIX + " " + msg).setStyle(Style.EMPTY.withColor(0xFF00FF));
             client.inGameHud.getChatHud().addMessage(debugMsg);
          }
       });
