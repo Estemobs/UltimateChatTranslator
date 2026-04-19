@@ -39,6 +39,13 @@ Un workflow GitHub Actions est inclus:
 - build du mod
 - publication d'une release GitHub avec le `.jar` en pièce jointe
 
+## Tests automatiques GitHub
+
+Un workflow GitHub Actions lance aussi les tests sur chaque push et pull request:
+- vérifie la compilation
+- teste la logique de traduction et de config sans lancer Minecraft
+- couvre la sélection des langues et les boutons de l'écran de config
+
 ## Installation manuelle (optionnel)
 
 Si tu preferes installer Java toi-meme:

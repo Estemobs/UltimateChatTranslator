@@ -11,7 +11,7 @@ import net.fabricmc.loader.api.FabricLoader;
 
 public class ModConfig {
    private static final Gson GSON = (new GsonBuilder()).setPrettyPrinting().create();
-   private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("chat_language_translate.json");
+   private static final Path CONFIG_PATH = resolveConfigPath();
    private static ModConfig INSTANCE = new ModConfig();
    public ModConfig.Language primaryLanguage;
    public boolean modEnabled;
@@ -31,6 +31,18 @@ public class ModConfig {
 
    public static ModConfig get() {
       return INSTANCE;
+   }
+
+   private static Path resolveConfigPath() {
+      try {
+         FabricLoader loader = FabricLoader.getInstance();
+         if (loader != null && loader.getConfigDir() != null) {
+            return loader.getConfigDir().resolve("chat_language_translate.json");
+         }
+      } catch (Exception ignored) {
+      }
+
+      return Path.of("config", "chat_language_translate.json");
    }
 
    public static void load() {

@@ -212,12 +212,13 @@ $BUILD_CMD build
 
 # Final check
 echo ""
-if [ -f "build/libs/chat_language_translate-1.0.0.jar" ]; then
-    JAR_SIZE=$(ls -lh "build/libs/chat_language_translate-1.0.0.jar" | awk '{print $5}')
+JAR_PATH=$(find build/libs -maxdepth 1 -type f -name 'chat_language_translate-*.jar' ! -name '*-sources.jar' | sort -V | tail -1)
+if [ -n "$JAR_PATH" ] && [ -f "$JAR_PATH" ]; then
+    JAR_SIZE=$(ls -lh "$JAR_PATH" | awk '{print $5}')
     echo -e "${GREEN}◆ BUILD RÉUSSI!${NC}"
     echo ""
     echo "📦 JAR généré:"
-    echo -e "   ${GREEN}build/libs/chat_language_translate-1.0.0.jar${NC} ($JAR_SIZE)"
+    echo -e "   ${GREEN}$JAR_PATH${NC} ($JAR_SIZE)"
     echo ""
     echo "📋 Prochaines étapes:"
     echo "   1. Copie le JAR dans: .minecraft/mods/"

@@ -1,6 +1,7 @@
 package duke.e.chat_language_translate.mixin.client;
 
 import duke.e.chat_language_translate.client.ModConfig;
+import duke.e.chat_language_translate.client.ChatTranslationRules;
 import duke.e.chat_language_translate.client.TranslationService;
 import net.minecraft.text.Text;
 import net.minecraft.text.MutableText;
@@ -16,7 +17,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class ChatHudMixin {
    private static final String TRANSLATION_PREFIX = "🌐 ";
    private static final String DEBUG_PREFIX = "[DEBUG]";
-   private static final java.util.regex.Pattern LEADING_CHAT_TAGS = java.util.regex.Pattern.compile("^(?:\\[[^\\]]+\\]\\s*)+");
    private static final int SENT_MESSAGE_COLOR = 0x00FF00;
    private static final int RECEIVED_MESSAGE_COLOR = 0xFFFF00;
 
@@ -47,8 +47,7 @@ public class ChatHudMixin {
          }
 
          String playerName = client.getSession().getUsername();
-         String strippedText = stripLeadingTags(rawText).trim();
-         String messageContent = extractSentMessageContent(strippedText, playerName);
+         String messageContent = ChatTranslationRules.extractSentMessageContent(rawText, playerName);
          boolean isSentMessage = messageContent != null;
 
          if (isSentMessage) {
@@ -56,7 +55,7 @@ public class ChatHudMixin {
                return;
             }
 
-            String targetLang = ModConfig.get().sentLanguage != null ? ModConfig.get().sentLanguage.getCode() : ModConfig.Language.TURKISH.getCode();
+            String targetLang = ChatTranslationRules.resolveTargetLanguageCode(true);
             sendDebug("📤 Message ENVOYÉ: " + messageContent);
             sendDebug("Traduction vers: " + targetLang);
 
@@ -92,7 +91,7 @@ public class ChatHudMixin {
             return;
          }
 
-         String targetLang = ModConfig.get().primaryLanguage != null ? ModConfig.get().primaryLanguage.getCode() : ModConfig.Language.TURKISH.getCode();
+         String targetLang = ChatTranslationRules.resolveTargetLanguageCode(false);
          sendDebug("📥 Message REÇU: " + rawText);
          sendDebug("Traduction vers: " + targetLang);
 
@@ -144,31 +143,5 @@ public class ChatHudMixin {
             client.inGameHud.getChatHud().addMessage(debugMsg);
          }
       });
-   }
-
-   private static String stripLeadingTags(String text) {
-      return LEADING_CHAT_TAGS.matcher(text).replaceFirst("");
-   }
-
-   private static String extractSentMessageContent(String text, String playerName) {
-      String playerPrefix = "<" + playerName + ">";
-      if (text.startsWith(playerPrefix)) {
-         if (text.length() <= playerPrefix.length()) {
-            return "";
-         }
-
-         return text.substring(playerPrefix.length()).trim();
-      }
-
-      String alternativePrefix = playerName + ":";
-      if (text.startsWith(alternativePrefix)) {
-         if (text.length() <= alternativePrefix.length()) {
-            return "";
-         }
-
-         return text.substring(alternativePrefix.length()).trim();
-      }
-
-      return null;
    }
 }

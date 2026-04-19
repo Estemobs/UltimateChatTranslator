@@ -23,19 +23,11 @@ public class ModMenuIntegration implements ModMenuApi {
       private ButtonWidget receivedLangBtn;
       private ButtonWidget sentLangBtn;
       private ButtonWidget debugBtn;
-      private boolean tempEnabled;
-      private boolean tempAuto;
-      private boolean tempDebug;
-      private ModConfig.Language tempReceivedLang;
-      private ModConfig.Language tempSentLang;
+      private final ConfigScreenState state;
 
       protected ConfigScreen(Screen parent) {
          super(Text.literal("Chat Language Translate — Config"));
-         this.tempEnabled = ModConfig.get().modEnabled;
-         this.tempAuto = ModConfig.get().autoTranslate;
-         this.tempDebug = ModConfig.get().debugMode;
-         this.tempReceivedLang = ModConfig.get().primaryLanguage;
-         this.tempSentLang = ModConfig.get().sentLanguage;
+         this.state = new ConfigScreenState(ModConfig.get());
          this.parent = parent;
       }
 
@@ -44,49 +36,43 @@ public class ModMenuIntegration implements ModMenuApi {
          int startY = this.height / 2 - 50;
 
          // Mod Enabled
-         this.toggleEnabledBtn = ButtonWidget.builder(Text.literal("Mod Enabled: " + (this.tempEnabled ? "ON" : "OFF")), (btn) -> {
-            this.tempEnabled = !this.tempEnabled;
-            btn.setMessage(Text.literal("Mod Enabled: " + (this.tempEnabled ? "ON" : "OFF")));
+         this.toggleEnabledBtn = ButtonWidget.builder(Text.literal("Mod Enabled: " + (this.state.isEnabled() ? "ON" : "OFF")), (btn) -> {
+            this.state.toggleEnabled();
+            btn.setMessage(Text.literal("Mod Enabled: " + (this.state.isEnabled() ? "ON" : "OFF")));
          }).dimensions(centerX - 100, startY, 200, 20).build();
          this.addDrawableChild(this.toggleEnabledBtn);
 
          // Auto Translate Mode
-         this.toggleAutoBtn = ButtonWidget.builder(Text.literal("Mode: " + (this.tempAuto ? "Auto Translate" : "Button Mode")), (btn) -> {
-            this.tempAuto = !this.tempAuto;
-            btn.setMessage(Text.literal("Mode: " + (this.tempAuto ? "Auto Translate" : "Button Mode")));
+         this.toggleAutoBtn = ButtonWidget.builder(Text.literal("Mode: " + (this.state.isAutoTranslate() ? "Auto Translate" : "Button Mode")), (btn) -> {
+            this.state.toggleAutoTranslate();
+            btn.setMessage(Text.literal("Mode: " + (this.state.isAutoTranslate() ? "Auto Translate" : "Button Mode")));
          }).dimensions(centerX - 100, startY + 25, 200, 20).build();
          this.addDrawableChild(this.toggleAutoBtn);
 
          // Received Messages Language
-         this.receivedLangBtn = ButtonWidget.builder(Text.literal("Langue msgs reçus: " + this.tempReceivedLang.toString()), (btn) -> {
-            int nextIdx = (this.tempReceivedLang.ordinal() + 1) % ModConfig.Language.values().length;
-            this.tempReceivedLang = ModConfig.Language.values()[nextIdx];
-            btn.setMessage(Text.literal("Langue msgs reçus: " + this.tempReceivedLang.toString()));
+         this.receivedLangBtn = ButtonWidget.builder(Text.literal("Langue msgs reçus: " + this.state.getReceivedLanguage().toString()), (btn) -> {
+            this.state.nextReceivedLanguage();
+            btn.setMessage(Text.literal("Langue msgs reçus: " + this.state.getReceivedLanguage().toString()));
          }).dimensions(centerX - 100, startY + 50, 200, 20).build();
          this.addDrawableChild(this.receivedLangBtn);
 
          // Sent Messages Language
-         this.sentLangBtn = ButtonWidget.builder(Text.literal("Langue msgs envoyés: " + this.tempSentLang.toString()), (btn) -> {
-            int nextIdx = (this.tempSentLang.ordinal() + 1) % ModConfig.Language.values().length;
-            this.tempSentLang = ModConfig.Language.values()[nextIdx];
-            btn.setMessage(Text.literal("Langue msgs envoyés: " + this.tempSentLang.toString()));
+         this.sentLangBtn = ButtonWidget.builder(Text.literal("Langue msgs envoyés: " + this.state.getSentLanguage().toString()), (btn) -> {
+            this.state.nextSentLanguage();
+            btn.setMessage(Text.literal("Langue msgs envoyés: " + this.state.getSentLanguage().toString()));
          }).dimensions(centerX - 100, startY + 75, 200, 20).build();
          this.addDrawableChild(this.sentLangBtn);
 
          // Debug Mode
-         this.debugBtn = ButtonWidget.builder(Text.literal("Debug: " + (this.tempDebug ? "ON" : "OFF")), (btn) -> {
-            this.tempDebug = !this.tempDebug;
-            btn.setMessage(Text.literal("Debug: " + (this.tempDebug ? "ON" : "OFF")));
+         this.debugBtn = ButtonWidget.builder(Text.literal("Debug: " + (this.state.isDebugMode() ? "ON" : "OFF")), (btn) -> {
+            this.state.toggleDebugMode();
+            btn.setMessage(Text.literal("Debug: " + (this.state.isDebugMode() ? "ON" : "OFF")));
          }).dimensions(centerX - 100, startY + 100, 200, 20).build();
          this.addDrawableChild(this.debugBtn);
 
          // Save Button
          this.addDrawableChild(ButtonWidget.builder(Text.literal("Save"), (btn) -> {
-            ModConfig.get().modEnabled = this.tempEnabled;
-            ModConfig.get().autoTranslate = this.tempAuto;
-            ModConfig.get().primaryLanguage = this.tempReceivedLang;
-            ModConfig.get().sentLanguage = this.tempSentLang;
-            ModConfig.get().debugMode = this.tempDebug;
+            this.state.saveTo(ModConfig.get());
             ModConfig.save();
             MinecraftClient.getInstance().setScreen(this.parent);
          }).dimensions(centerX - 100, startY + 135, 95, 20).build());
