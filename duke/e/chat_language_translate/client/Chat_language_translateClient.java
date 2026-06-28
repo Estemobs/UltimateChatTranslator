@@ -41,7 +41,7 @@ public class Chat_language_translateClient implements ClientModInitializer {
                TranslationService.translate(rawText, targetLang).thenAccept((result) -> {
                   if (result != null && result.translatedText() != null) {
                      String var10000 = targetLang.toUpperCase();
-                     MutableText translationText = Text.literal("  ↳ (" + var10000 + ") " + result.translatedText()).setStyle(Style.EMPTY.withItalic(true).withColor(0xFF00));
+                     MutableText translationText = Text.literal(ChatTranslationRules.TRANSLATION_PREFIX + "  ↳ (" + var10000 + ") " + result.translatedText()).setStyle(Style.EMPTY.withItalic(true).withColor(0xFF00));
                      MinecraftClient client = MinecraftClient.getInstance();
                      client.execute(() -> {
                         if (client.inGameHud != null) {
