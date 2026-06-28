@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Chat Language Translate - Build Script
+# Universal Chat Translator - Build Script
 # Installe les dependances manquantes (Arch/Debian) puis compile le JAR
 
 set -e
@@ -13,7 +13,7 @@ NC='\033[0m'
 
 echo -e "${YELLOW}"
 echo "◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆"
-echo "  Chat Language Translate - Build"
+echo "  Universal Chat Translator - Build"
 echo "◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆"
 echo -e "${NC}"
 
