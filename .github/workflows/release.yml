@@ -27,6 +27,12 @@ jobs:
         with:
           gradle-version: 8.8
 
+      - name: Set version from tag
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          sed -i "s/^mod_version=.*/mod_version=${VERSION}/" gradle.properties
+
       - name: Build
         run: gradle build
 

@@ -32,20 +32,25 @@ class ConfigScreenStateTest {
 
       ModConfig.Language initialReceived = state.getReceivedLanguage();
       ModConfig.Language initialSent = state.getSentLanguage();
+      ModConfig.Language initialMenu = state.getMenuLanguage();
 
       state.nextReceivedLanguage();
       state.nextSentLanguage();
+      state.nextMenuLanguage();
 
       assertEquals(ChatTranslationRules.nextLanguage(initialReceived), state.getReceivedLanguage());
       assertEquals(ChatTranslationRules.nextLanguage(initialSent), state.getSentLanguage());
+      assertEquals(ChatTranslationRules.nextLanguage(initialMenu), state.getMenuLanguage());
 
       for (int i = 1; i < ModConfig.Language.values().length; i++) {
          state.nextReceivedLanguage();
          state.nextSentLanguage();
+         state.nextMenuLanguage();
       }
 
       assertEquals(initialReceived, state.getReceivedLanguage());
       assertEquals(initialSent, state.getSentLanguage());
+      assertEquals(initialMenu, state.getMenuLanguage());
    }
 
    @Test
@@ -59,6 +64,7 @@ class ConfigScreenStateTest {
       state.toggleTranslateWorldText();
       state.nextReceivedLanguage();
       state.nextSentLanguage();
+      state.nextMenuLanguage();
       state.saveTo(config);
 
       assertEquals(state.isEnabled(), config.modEnabled);
@@ -67,5 +73,6 @@ class ConfigScreenStateTest {
       assertEquals(state.isTranslateWorldText(), config.translateWorldText);
       assertEquals(state.getReceivedLanguage(), config.primaryLanguage);
       assertEquals(state.getSentLanguage(), config.sentLanguage);
+      assertEquals(state.getMenuLanguage(), config.menuLanguage);
    }
 }

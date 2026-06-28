@@ -7,6 +7,7 @@ public final class ConfigScreenState {
    private boolean translateWorldText;
    private ModConfig.Language receivedLanguage;
    private ModConfig.Language sentLanguage;
+   private ModConfig.Language menuLanguage;
 
    public ConfigScreenState(ModConfig config) {
       this.enabled = config.modEnabled;
@@ -15,6 +16,7 @@ public final class ConfigScreenState {
       this.translateWorldText = config.translateWorldText;
       this.receivedLanguage = ChatTranslationRules.normalizeLanguage(config.primaryLanguage);
       this.sentLanguage = ChatTranslationRules.normalizeLanguage(config.sentLanguage);
+      this.menuLanguage = config.menuLanguage != null ? config.menuLanguage : ModConfig.Language.ENGLISH;
    }
 
    public boolean isEnabled() {
@@ -41,6 +43,10 @@ public final class ConfigScreenState {
       return this.sentLanguage;
    }
 
+   public ModConfig.Language getMenuLanguage() {
+      return this.menuLanguage;
+   }
+
    public void toggleEnabled() {
       this.enabled = !this.enabled;
    }
@@ -65,6 +71,10 @@ public final class ConfigScreenState {
       this.sentLanguage = ChatTranslationRules.nextLanguage(this.sentLanguage);
    }
 
+   public void nextMenuLanguage() {
+      this.menuLanguage = ChatTranslationRules.nextLanguage(this.menuLanguage);
+   }
+
    public void saveTo(ModConfig config) {
       config.modEnabled = this.enabled;
       config.autoTranslate = this.autoTranslate;
@@ -72,5 +82,6 @@ public final class ConfigScreenState {
       config.sentLanguage = this.sentLanguage;
       config.debugMode = this.debugMode;
       config.translateWorldText = this.translateWorldText;
+      config.menuLanguage = this.menuLanguage;
    }
 }
