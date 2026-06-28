@@ -2,10 +2,12 @@
   "schemaVersion": 1,
   "id": "chat_language_translate",
   "version": "${version}",
-  "name": "Universal Chat Translator",
+  "name": "Lingo",
   "description": "Automatically translates chat messages, signs, and in-game menus to the language of your choice.",
-  "authors": [],
+  "authors": ["Estemobs"],
   "contact": {
+    "homepage": "https://github.com/Estemobs/UniversalChatTranslator",
+    "issues": "https://github.com/Estemobs/UniversalChatTranslator/issues",
     "sources": "https://github.com/Estemobs/UniversalChatTranslator"
   },
   "license": "MIT",
