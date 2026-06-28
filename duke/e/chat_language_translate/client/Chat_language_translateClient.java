@@ -22,11 +22,7 @@ public class Chat_language_translateClient implements ClientModInitializer {
       // Message de démarrage
       MinecraftClient.getInstance().execute(() -> {
          MinecraftClient client = MinecraftClient.getInstance();
-         if (client.inGameHud != null) {
-            MutableText startMsg = Text.literal("✓ Chat Language Translate chargé!")
-               .setStyle(Style.EMPTY.withColor(0x00FF00));
-            client.inGameHud.getChatHud().addMessage(startMsg);
-         }
+         ChatMessageDispatcher.addWithoutReprocessing(client, Text.literal("✓ Chat Language Translate chargé!"));
       });
 
       ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
@@ -40,15 +36,9 @@ public class Chat_language_translateClient implements ClientModInitializer {
                String targetLang = ModConfig.get().primaryLanguage.getCode();
                TranslationService.translate(rawText, targetLang).thenAccept((result) -> {
                   if (result != null && result.translatedText() != null) {
-                     String var10000 = targetLang.toUpperCase();
-                     MutableText translationText = Text.literal(ChatTranslationRules.TRANSLATION_PREFIX + "  ↳ (" + var10000 + ") " + result.translatedText()).setStyle(Style.EMPTY.withItalic(true).withColor(0xFF00));
+                     MutableText translationText = Text.literal(result.translatedText());
                      MinecraftClient client = MinecraftClient.getInstance();
-                     client.execute(() -> {
-                        if (client.inGameHud != null) {
-                           client.inGameHud.getChatHud().addMessage(translationText);
-                        }
-
-                     });
+                     client.execute(() -> ChatMessageDispatcher.addWithoutReprocessing(client, translationText));
                   }
                });
                return 1;
