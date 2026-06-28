@@ -3,6 +3,8 @@ package duke.e.chat_language_translate.client;
 import java.util.regex.Pattern;
 
 public final class ChatTranslationRules {
+   public static final String TRANSLATION_PREFIX = "🌐 ";
+
    private static final Pattern LEADING_CHAT_TAGS = Pattern.compile("^(?:\\[[^\\]]+\\]\\s*)+");
 
    private ChatTranslationRules() {
