@@ -4,7 +4,10 @@
   "package": "duke.e.chat_language_translate.mixin.client",
   "compatibilityLevel": "JAVA_21",
   "client": [
-    "ChatHudMixin"
+    "ChatHudMixin",
+    "SignBlockEntityRendererMixin",
+    "HandledScreenTitleMixin",
+    "ScreenTooltipMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -23,6 +23,7 @@ public class ModMenuIntegration implements ModMenuApi {
       private ButtonWidget receivedLangBtn;
       private ButtonWidget sentLangBtn;
       private ButtonWidget debugBtn;
+      private ButtonWidget translateWorldBtn;
       private final ConfigScreenState state;
 
       protected ConfigScreen(Screen parent) {
@@ -70,17 +71,24 @@ public class ModMenuIntegration implements ModMenuApi {
          }).dimensions(centerX - 100, startY + 100, 200, 20).build();
          this.addDrawableChild(this.debugBtn);
 
+         // Traduction des panneaux et menus in-game
+         this.translateWorldBtn = ButtonWidget.builder(Text.literal("Panneaux/Menus in-game: " + (this.state.isTranslateWorldText() ? "ON" : "OFF")), (btn) -> {
+            this.state.toggleTranslateWorldText();
+            btn.setMessage(Text.literal("Panneaux/Menus in-game: " + (this.state.isTranslateWorldText() ? "ON" : "OFF")));
+         }).dimensions(centerX - 100, startY + 125, 200, 20).build();
+         this.addDrawableChild(this.translateWorldBtn);
+
          // Save Button
          this.addDrawableChild(ButtonWidget.builder(Text.literal("Save"), (btn) -> {
             this.state.saveTo(ModConfig.get());
             ModConfig.save();
             MinecraftClient.getInstance().setScreen(this.parent);
-         }).dimensions(centerX - 100, startY + 135, 95, 20).build());
+         }).dimensions(centerX - 100, startY + 160, 95, 20).build());
 
          // Cancel Button
          this.addDrawableChild(ButtonWidget.builder(Text.literal("Cancel"), (btn) -> {
             MinecraftClient.getInstance().setScreen(this.parent);
-         }).dimensions(centerX + 5, startY + 135, 95, 20).build());
+         }).dimensions(centerX + 5, startY + 160, 95, 20).build());
       }
 
       public void render(DrawContext context, int mouseX, int mouseY, float delta) {
