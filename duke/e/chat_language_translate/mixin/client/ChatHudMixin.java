@@ -93,10 +93,12 @@ public class ChatHudMixin {
          }
 
          String targetLang = ChatTranslationRules.resolveTargetLanguageCode(false);
+         String speakerPrefix = ChatTranslationRules.extractSpeakerPrefix(rawText);
+         String contentToTranslate = ChatTranslationRules.stripSpeakerPrefix(rawText);
          sendDebug("📥 Message REÇU: " + rawText);
          sendDebug("Traduction vers: " + targetLang);
 
-         TranslationService.translate(rawText, targetLang).thenAccept((result) -> {
+         TranslationService.translate(contentToTranslate, targetLang).thenAccept((result) -> {
             if (result == null) {
                return;
             }
@@ -106,7 +108,7 @@ public class ChatHudMixin {
             if (detected == null || translated == null || translated.isBlank()) {
                return;
             }
-            if (translated.equalsIgnoreCase(rawText)) {
+            if (translated.equalsIgnoreCase(contentToTranslate)) {
                return;
             }
 
@@ -117,7 +119,7 @@ public class ChatHudMixin {
             }
 
             sendDebug("✅ Résultat reçu: " + translated);
-            client.execute(() -> ChatMessageDispatcher.addWithoutReprocessing(client, Text.literal(translated)));
+            client.execute(() -> ChatMessageDispatcher.addWithoutReprocessing(client, Text.literal(speakerPrefix + translated)));
          }).exceptionally((error) -> {
             sendDebug("❌ ERREUR reçu: " + error.getMessage());
             return null;

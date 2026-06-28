@@ -35,6 +35,23 @@ class ChatTranslationRulesTest {
    }
 
    @Test
+   void extractSpeakerPrefixHandlesAngleBracketFormatForAnyPlayer() {
+      assertEquals("<NeAllaid> ", ChatTranslationRules.extractSpeakerPrefix("<NeAllaid> ДА БЛЯТЬ"));
+      assertEquals("<NeAllaid> ", ChatTranslationRules.extractSpeakerPrefix("[Not Secure] <NeAllaid> ДА БЛЯТЬ"));
+   }
+
+   @Test
+   void extractSpeakerPrefixReturnsEmptyWhenNoPrefixPresent() {
+      assertEquals("", ChatTranslationRules.extractSpeakerPrefix("что?"));
+   }
+
+   @Test
+   void stripSpeakerPrefixRemovesOnlyTheSpeakerPart() {
+      assertEquals("ДА БЛЯТЬ", ChatTranslationRules.stripSpeakerPrefix("[Not Secure] <NeAllaid> ДА БЛЯТЬ"));
+      assertEquals("что?", ChatTranslationRules.stripSpeakerPrefix("что?"));
+   }
+
+   @Test
    void resolveTargetLanguageUsesConfiguredLanguage() {
       assertEquals("ru", ChatTranslationRules.resolveTargetLanguageCode(true, ModConfig.Language.FRENCH, ModConfig.Language.RUSSIAN));
       assertEquals("fr", ChatTranslationRules.resolveTargetLanguageCode(false, ModConfig.Language.FRENCH, ModConfig.Language.RUSSIAN));
