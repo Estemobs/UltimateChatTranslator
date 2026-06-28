@@ -16,17 +16,17 @@ import static duke.e.chat_language_translate.client.ModConfig.Language.TURKISH;
 
 public enum MenuLocalization {
    TITLE(Map.ofEntries(
-      Map.entry(ENGLISH, "Chat Language Translate — Settings"),
-      Map.entry(FRENCH, "Chat Language Translate — Paramètres"),
-      Map.entry(TURKISH, "Chat Language Translate — Ayarlar"),
-      Map.entry(GERMAN, "Chat Language Translate — Einstellungen"),
-      Map.entry(SPANISH, "Chat Language Translate — Configuración"),
-      Map.entry(RUSSIAN, "Chat Language Translate — Настройки"),
-      Map.entry(JAPANESE, "Chat Language Translate — 設定"),
-      Map.entry(CHINESE, "Chat Language Translate — 设置"),
-      Map.entry(KOREAN, "Chat Language Translate — 설정"),
-      Map.entry(ITALIAN, "Chat Language Translate — Impostazioni"),
-      Map.entry(PORTUGUESE, "Chat Language Translate — Configurações")
+      Map.entry(ENGLISH, "Universal Chat Translator — Settings"),
+      Map.entry(FRENCH, "Universal Chat Translator — Paramètres"),
+      Map.entry(TURKISH, "Universal Chat Translator — Ayarlar"),
+      Map.entry(GERMAN, "Universal Chat Translator — Einstellungen"),
+      Map.entry(SPANISH, "Universal Chat Translator — Configuración"),
+      Map.entry(RUSSIAN, "Universal Chat Translator — Настройки"),
+      Map.entry(JAPANESE, "Universal Chat Translator — 設定"),
+      Map.entry(CHINESE, "Universal Chat Translator — 设置"),
+      Map.entry(KOREAN, "Universal Chat Translator — 설정"),
+      Map.entry(ITALIAN, "Universal Chat Translator — Impostazioni"),
+      Map.entry(PORTUGUESE, "Universal Chat Translator — Configurações")
    )),
    MOD_ENABLED(Map.ofEntries(
       Map.entry(ENGLISH, "Mod Enabled"),
