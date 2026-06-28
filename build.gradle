@@ -40,11 +40,16 @@ sourceSets {
             include 'fabric.mod.json'
             include '*.json'
             include 'assets/**'
-            include 'META-INF/**'
         }
     }
 }
 
+processResources {
+    inputs.property 'version', project.version
+    filesMatching('fabric.mod.json') {
+        expand version: project.version
+    }
+}
 
 tasks.withType(JavaCompile).configureEach {
     it.options.encoding = 'UTF-8'

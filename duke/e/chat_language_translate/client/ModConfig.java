@@ -20,6 +20,7 @@ public class ModConfig {
    public ModConfig.Language sentLanguage;
    public boolean debugMode;
    public boolean translateWorldText;
+   public ModConfig.Language menuLanguage;
 
    public ModConfig() {
       this.primaryLanguage = ModConfig.Language.TURKISH;
@@ -29,6 +30,7 @@ public class ModConfig {
       this.sentLanguage = ModConfig.Language.TURKISH;
       this.debugMode = false;
       this.translateWorldText = true;
+      this.menuLanguage = ModConfig.Language.ENGLISH;
    }
 
    public static ModConfig get() {
@@ -62,6 +64,10 @@ public class ModConfig {
 
                if (INSTANCE.sentLanguage == null) {
                   INSTANCE.sentLanguage = ModConfig.Language.TURKISH;
+               }
+
+               if (INSTANCE.menuLanguage == null) {
+                  INSTANCE.menuLanguage = ModConfig.Language.ENGLISH;
                }
             } catch (Throwable var4) {
                if (reader != null) {
