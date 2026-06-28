@@ -1,6 +1,7 @@
 package duke.e.chat_language_translate.mixin.client;
 
 import duke.e.chat_language_translate.client.Chat_language_translateClient;
+import duke.e.chat_language_translate.client.ChatMessageDispatcher;
 import duke.e.chat_language_translate.client.ModConfig;
 import duke.e.chat_language_translate.client.ChatTranslationRules;
 import duke.e.chat_language_translate.client.TranslationService;
@@ -22,16 +23,8 @@ import java.util.UUID;
 
 @Mixin(ChatHud.class)
 public class ChatHudMixin {
-   private static final String TRANSLATION_PREFIX = ChatTranslationRules.TRANSLATION_PREFIX;
    private static final String DEBUG_PREFIX = "[DEBUG]";
-   private static final String STARTUP_PREFIX = "✓ Chat Language Translate";
-   private static final int SENT_MESSAGE_COLOR = 0x00FF00;
-   private static final int RECEIVED_MESSAGE_COLOR = 0xFFFF00;
    private static final int BUTTON_COLOR = 0x55FFFF;
-
-   // Set while this mixin re-adds a message itself (fallback/translated/button text),
-   // so that re-entrant call into this same injection doesn't reprocess it forever.
-   private static boolean reentryGuard = false;
 
    @Inject(
       method = "addMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/message/MessageSignatureData;Lnet/minecraft/client/gui/hud/MessageIndicator;)V",
@@ -39,7 +32,7 @@ public class ChatHudMixin {
       cancellable = true
    )
    private void onAddMessage(Text message, MessageSignatureData signatureData, MessageIndicator indicator, CallbackInfo ci) {
-      if (reentryGuard) {
+      if (ChatMessageDispatcher.isSuppressing()) {
          return;
       }
 
@@ -51,10 +44,6 @@ public class ChatHudMixin {
          String rawText = message.getString();
 
          if (rawText == null || rawText.isBlank()) {
-            return;
-         }
-
-         if (rawText.startsWith(TRANSLATION_PREFIX) || rawText.startsWith(DEBUG_PREFIX) || rawText.startsWith(STARTUP_PREFIX)) {
             return;
          }
 
@@ -78,21 +67,16 @@ public class ChatHudMixin {
 
             TranslationService.translate(messageContent, targetLang).thenAccept((result) -> {
                client.execute(() -> {
-                  if (client.inGameHud == null) {
-                     return;
-                  }
-
                   if (result != null && result.translatedText() != null && !result.translatedText().isBlank() && !result.translatedText().equalsIgnoreCase(messageContent)) {
                      sendDebug("✅ Résultat envoyé: " + result.translatedText());
-                     MutableText translatedMsg = Text.literal(TRANSLATION_PREFIX + result.translatedText()).setStyle(Style.EMPTY.withItalic(true).withColor(SENT_MESSAGE_COLOR));
-                     addRaw(client, translatedMsg);
+                     ChatMessageDispatcher.addWithoutReprocessing(client, Text.literal(result.translatedText()));
                   } else {
-                     addRaw(client, message);
+                     ChatMessageDispatcher.addWithoutReprocessing(client, message);
                   }
                });
             }).exceptionally((error) -> {
                sendDebug("❌ ERREUR envoyé: " + error.getMessage());
-               client.execute(() -> addRaw(client, message));
+               client.execute(() -> ChatMessageDispatcher.addWithoutReprocessing(client, message));
                return null;
             });
 
@@ -131,8 +115,7 @@ public class ChatHudMixin {
             }
 
             sendDebug("✅ Résultat reçu: " + translated);
-            MutableText translationText = Text.literal(TRANSLATION_PREFIX + translated).setStyle(Style.EMPTY.withItalic(true).withColor(RECEIVED_MESSAGE_COLOR));
-            client.execute(() -> addRaw(client, translationText));
+            client.execute(() -> ChatMessageDispatcher.addWithoutReprocessing(client, Text.literal(translated)));
          }).exceptionally((error) -> {
             sendDebug("❌ ERREUR reçu: " + error.getMessage());
             return null;
@@ -153,20 +136,7 @@ public class ChatHudMixin {
          .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal(primaryLanguage.getHoverText())));
 
       MutableText withButton = original.copy().append(Text.literal(" " + primaryLanguage.getDefaultButtonText()).setStyle(buttonStyle));
-      addRaw(client, withButton);
-   }
-
-   private static void addRaw(MinecraftClient client, Text message) {
-      if (client.inGameHud == null) {
-         return;
-      }
-
-      reentryGuard = true;
-      try {
-         client.inGameHud.getChatHud().addMessage(message);
-      } finally {
-         reentryGuard = false;
-      }
+      ChatMessageDispatcher.addWithoutReprocessing(client, withButton);
    }
 
    private static void sendDebug(String msg) {
@@ -177,7 +147,7 @@ public class ChatHudMixin {
       MinecraftClient client = MinecraftClient.getInstance();
       client.execute(() -> {
          MutableText debugMsg = Text.literal(DEBUG_PREFIX + " " + msg).setStyle(Style.EMPTY.withColor(0xFF00FF));
-         addRaw(client, debugMsg);
+         ChatMessageDispatcher.addWithoutReprocessing(client, debugMsg);
       });
    }
 }
