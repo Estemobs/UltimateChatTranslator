@@ -6,6 +6,8 @@
   "description": "Automatically translates chat messages, signs, and in-game menus to the language of your choice.",
   "authors": [],
   "contact": {
+    "homepage": "https://github.com/Estemobs/UniversalChatTranslator",
+    "issues": "https://github.com/Estemobs/UniversalChatTranslator/issues",
     "sources": "https://github.com/Estemobs/UniversalChatTranslator"
   },
   "license": "MIT",
