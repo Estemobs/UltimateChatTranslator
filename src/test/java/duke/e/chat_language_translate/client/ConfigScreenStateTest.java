@@ -12,13 +12,17 @@ class ConfigScreenStateTest {
       ModConfig config = new ModConfig();
       ConfigScreenState state = new ConfigScreenState(config);
 
+      boolean initialTranslateWorldText = state.isTranslateWorldText();
+
       state.toggleEnabled();
       state.toggleAutoTranslate();
       state.toggleDebugMode();
+      state.toggleTranslateWorldText();
 
       assertFalse(state.isEnabled());
       assertTrue(state.isAutoTranslate());
       assertTrue(state.isDebugMode());
+      assertEquals(!initialTranslateWorldText, state.isTranslateWorldText());
    }
 
    @Test
@@ -52,6 +56,7 @@ class ConfigScreenStateTest {
       state.toggleEnabled();
       state.toggleAutoTranslate();
       state.toggleDebugMode();
+      state.toggleTranslateWorldText();
       state.nextReceivedLanguage();
       state.nextSentLanguage();
       state.saveTo(config);
@@ -59,6 +64,7 @@ class ConfigScreenStateTest {
       assertEquals(state.isEnabled(), config.modEnabled);
       assertEquals(state.isAutoTranslate(), config.autoTranslate);
       assertEquals(state.isDebugMode(), config.debugMode);
+      assertEquals(state.isTranslateWorldText(), config.translateWorldText);
       assertEquals(state.getReceivedLanguage(), config.primaryLanguage);
       assertEquals(state.getSentLanguage(), config.sentLanguage);
    }

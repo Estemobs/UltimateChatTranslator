@@ -19,6 +19,7 @@ public class ModConfig {
    public String buttonText;
    public ModConfig.Language sentLanguage;
    public boolean debugMode;
+   public boolean translateWorldText;
 
    public ModConfig() {
       this.primaryLanguage = ModConfig.Language.TURKISH;
@@ -27,6 +28,7 @@ public class ModConfig {
       this.buttonText = "[Çevir]";
       this.sentLanguage = ModConfig.Language.TURKISH;
       this.debugMode = false;
+      this.translateWorldText = true;
    }
 
    public static ModConfig get() {

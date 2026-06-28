@@ -4,6 +4,7 @@ public final class ConfigScreenState {
    private boolean enabled;
    private boolean autoTranslate;
    private boolean debugMode;
+   private boolean translateWorldText;
    private ModConfig.Language receivedLanguage;
    private ModConfig.Language sentLanguage;
 
@@ -11,6 +12,7 @@ public final class ConfigScreenState {
       this.enabled = config.modEnabled;
       this.autoTranslate = config.autoTranslate;
       this.debugMode = config.debugMode;
+      this.translateWorldText = config.translateWorldText;
       this.receivedLanguage = ChatTranslationRules.normalizeLanguage(config.primaryLanguage);
       this.sentLanguage = ChatTranslationRules.normalizeLanguage(config.sentLanguage);
    }
@@ -25,6 +27,10 @@ public final class ConfigScreenState {
 
    public boolean isDebugMode() {
       return this.debugMode;
+   }
+
+   public boolean isTranslateWorldText() {
+      return this.translateWorldText;
    }
 
    public ModConfig.Language getReceivedLanguage() {
@@ -47,6 +53,10 @@ public final class ConfigScreenState {
       this.debugMode = !this.debugMode;
    }
 
+   public void toggleTranslateWorldText() {
+      this.translateWorldText = !this.translateWorldText;
+   }
+
    public void nextReceivedLanguage() {
       this.receivedLanguage = ChatTranslationRules.nextLanguage(this.receivedLanguage);
    }
@@ -61,5 +71,6 @@ public final class ConfigScreenState {
       config.primaryLanguage = this.receivedLanguage;
       config.sentLanguage = this.sentLanguage;
       config.debugMode = this.debugMode;
+      config.translateWorldText = this.translateWorldText;
    }
 }
