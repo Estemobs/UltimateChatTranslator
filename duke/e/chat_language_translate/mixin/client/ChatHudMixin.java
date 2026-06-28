@@ -136,8 +136,8 @@ public class ChatHudMixin {
       ModConfig.Language primaryLanguage = ChatTranslationRules.normalizeLanguage(ModConfig.get().primaryLanguage);
       Style buttonStyle = Style.EMPTY
          .withColor(BUTTON_COLOR)
-         .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/clt_translate " + cacheKey))
-         .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal(primaryLanguage.getHoverText())));
+         .withClickEvent(new ClickEvent.RunCommand("/clt_translate " + cacheKey))
+         .withHoverEvent(new HoverEvent.ShowText(Text.literal(primaryLanguage.getHoverText())));
 
       MutableText withButton = original.copy().append(Text.literal(" " + primaryLanguage.getDefaultButtonText()).setStyle(buttonStyle));
       ChatMessageDispatcher.addWithoutReprocessing(client, withButton);
