@@ -30,7 +30,7 @@ public class Chat_language_translateClient implements ClientModInitializer {
             String cacheKey = StringArgumentType.getString(context, "cacheKey");
             String rawText = (String)TRANSLATION_CACHE.get(cacheKey);
             if (rawText == null) {
-               ((FabricClientCommandSource)context.getSource()).sendFeedback(Text.literal("Translation expired or not found.").withColor(0xFF0000));
+               ((FabricClientCommandSource)context.getSource()).sendFeedback(Text.literal("Translation expired or not found.").setStyle(Style.EMPTY.withColor(0xFF0000)));
                return 1;
             } else {
                String targetLang = ModConfig.get().primaryLanguage.getCode();
