@@ -4,7 +4,7 @@ import duke.e.chat_language_translate.client.ChatTranslationRules;
 import duke.e.chat_language_translate.client.ModConfig;
 import duke.e.chat_language_translate.client.WorldTextTranslationCache;
 import net.minecraft.block.entity.SignText;
-import net.minecraft.client.render.block.entity.SignBlockEntityRenderer;
+import net.minecraft.client.render.block.entity.AbstractSignBlockEntityRenderer;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 import java.util.function.Function;
 
-@Mixin(SignBlockEntityRenderer.class)
+@Mixin(AbstractSignBlockEntityRenderer.class)
 public class SignBlockEntityRendererMixin {
    @Redirect(
       method = "renderText(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/entity/SignText;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IIIZ)V",

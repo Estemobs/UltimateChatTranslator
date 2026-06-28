@@ -86,8 +86,8 @@ ensure_unzip() {
 }
 
 ensure_gradle_compatible() {
-    local min_required="8.6"
-    local bundled_version="8.8"
+    local min_required="8.11"
+    local bundled_version="8.11"
     local gradle_cmd=""
 
     if command -v gradle >/dev/null 2>&1; then
@@ -188,8 +188,8 @@ if [ -f "gradle/wrapper/gradle-wrapper.jar" ]; then
 else
     echo -e "${YELLOW}→${NC} Gradle Wrapper absent, preparation d'un Gradle compatible"
     ensure_gradle_compatible
-    echo -e "${YELLOW}→${NC} Generation du Gradle Wrapper (8.8)..."
-    "$GRADLE_CMD" wrapper --gradle-version 8.8 --distribution-type bin || true
+    echo -e "${YELLOW}→${NC} Generation du Gradle Wrapper (8.11)..."
+    "$GRADLE_CMD" wrapper --gradle-version 8.11 --distribution-type bin || true
     if [ -f "gradle/wrapper/gradle-wrapper.jar" ]; then
         BUILD_CMD="java -classpath gradle/wrapper/gradle-wrapper.jar org.gradle.wrapper.GradleWrapperMain"
         echo -e "${GREEN}✓ Gradle Wrapper${NC} genere"
