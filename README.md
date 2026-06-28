@@ -1,8 +1,8 @@
 <div align="center">
 
-<img src="assets/chat_language_translate/icon.png" width="96" height="96" alt="Universal Chat Translator icon" />
+<img src="assets/chat_language_translate/icon.png" width="96" height="96" alt="Lingo icon" />
 
-# Universal Chat Translator
+# Lingo
 
 **Automatically translates chat, signs, and in-game menus to the language you choose — live, in Minecraft.**
 

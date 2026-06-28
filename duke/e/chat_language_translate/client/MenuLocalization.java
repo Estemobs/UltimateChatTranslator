@@ -16,17 +16,17 @@ import static duke.e.chat_language_translate.client.ModConfig.Language.TURKISH;
 
 public enum MenuLocalization {
    TITLE(Map.ofEntries(
-      Map.entry(ENGLISH, "Universal Chat Translator — Settings"),
-      Map.entry(FRENCH, "Universal Chat Translator — Paramètres"),
-      Map.entry(TURKISH, "Universal Chat Translator — Ayarlar"),
-      Map.entry(GERMAN, "Universal Chat Translator — Einstellungen"),
-      Map.entry(SPANISH, "Universal Chat Translator — Configuración"),
-      Map.entry(RUSSIAN, "Universal Chat Translator — Настройки"),
-      Map.entry(JAPANESE, "Universal Chat Translator — 設定"),
-      Map.entry(CHINESE, "Universal Chat Translator — 设置"),
-      Map.entry(KOREAN, "Universal Chat Translator — 설정"),
-      Map.entry(ITALIAN, "Universal Chat Translator — Impostazioni"),
-      Map.entry(PORTUGUESE, "Universal Chat Translator — Configurações")
+      Map.entry(ENGLISH, "Lingo — Settings"),
+      Map.entry(FRENCH, "Lingo — Paramètres"),
+      Map.entry(TURKISH, "Lingo — Ayarlar"),
+      Map.entry(GERMAN, "Lingo — Einstellungen"),
+      Map.entry(SPANISH, "Lingo — Configuración"),
+      Map.entry(RUSSIAN, "Lingo — Настройки"),
+      Map.entry(JAPANESE, "Lingo — 設定"),
+      Map.entry(CHINESE, "Lingo — 设置"),
+      Map.entry(KOREAN, "Lingo — 설정"),
+      Map.entry(ITALIAN, "Lingo — Impostazioni"),
+      Map.entry(PORTUGUESE, "Lingo — Configurações")
    )),
    MOD_ENABLED(Map.ofEntries(
       Map.entry(ENGLISH, "Mod Enabled"),
