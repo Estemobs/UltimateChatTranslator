@@ -30,7 +30,7 @@ public class ModMenuIntegration implements ModMenuApi {
       private final ConfigScreenState state;
 
       protected ConfigScreen(Screen parent) {
-         super(Text.literal("Lingo — Settings"));
+         super(Text.literal("Ultimate Chat Translator — Settings"));
          this.state = new ConfigScreenState(ModConfig.get());
          this.parent = parent;
       }

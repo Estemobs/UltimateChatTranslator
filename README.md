@@ -1,14 +1,14 @@
 <div align="center">
 
-<img src="assets/chat_language_translate/icon.png" width="96" height="96" alt="Lingo icon" />
+<img src="assets/chat_language_translate/icon.png" width="96" height="96" alt="Ultimate Chat Translator icon" />
 
-# Lingo
+# Ultimate Chat Translator
 
 **Automatically translates chat, signs, and in-game menus to the language you choose — live, in Minecraft.**
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Minecraft 1.21.1](https://img.shields.io/badge/Minecraft-1.21.1-blue.svg)](https://fabricmc.net/)
-[![Test Mod](https://github.com/Estemobs/UniversalChatTranslator/actions/workflows/tests.yml/badge.svg)](https://github.com/Estemobs/UniversalChatTranslator/actions/workflows/tests.yml)
+[![Test Mod](https://github.com/Estemobs/UltimateChatTranslator/actions/workflows/tests.yml/badge.svg)](https://github.com/Estemobs/UltimateChatTranslator/actions/workflows/tests.yml)
 
 </div>
 
@@ -31,7 +31,7 @@
 
 ## Installation
 
-1. Download the latest `.jar` from the [Releases](https://github.com/Estemobs/UniversalChatTranslator/releases) page.
+1. Download the latest `.jar` from the [Releases](https://github.com/Estemobs/UltimateChatTranslator/releases) page.
 2. Drop it into your `mods` folder alongside Fabric API.
 3. Launch Minecraft with the Fabric profile.
 4. Open the settings via Mod Menu (or edit the generated config file) to pick your languages.
