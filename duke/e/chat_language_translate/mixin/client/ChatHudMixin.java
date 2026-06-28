@@ -65,11 +65,13 @@ public class ChatHudMixin {
             sendDebug("📤 Message ENVOYÉ: " + messageContent);
             sendDebug("Traduction vers: " + targetLang);
 
+            String sentSpeakerPrefix = "<" + playerName + "> ";
+
             TranslationService.translate(messageContent, targetLang).thenAccept((result) -> {
                client.execute(() -> {
                   if (result != null && result.translatedText() != null && !result.translatedText().isBlank() && !result.translatedText().equalsIgnoreCase(messageContent)) {
                      sendDebug("✅ Résultat envoyé: " + result.translatedText());
-                     ChatMessageDispatcher.addWithoutReprocessing(client, Text.literal(result.translatedText()));
+                     ChatMessageDispatcher.addWithoutReprocessing(client, Text.literal(sentSpeakerPrefix + result.translatedText()));
                   } else {
                      ChatMessageDispatcher.addWithoutReprocessing(client, message);
                   }
