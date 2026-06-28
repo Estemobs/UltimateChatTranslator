@@ -34,9 +34,11 @@ public class Chat_language_translateClient implements ClientModInitializer {
                return 1;
             } else {
                String targetLang = ModConfig.get().primaryLanguage.getCode();
-               TranslationService.translate(rawText, targetLang).thenAccept((result) -> {
+               String speakerPrefix = ChatTranslationRules.extractSpeakerPrefix(rawText);
+               String content = ChatTranslationRules.stripSpeakerPrefix(rawText);
+               TranslationService.translate(content, targetLang).thenAccept((result) -> {
                   if (result != null && result.translatedText() != null) {
-                     MutableText translationText = Text.literal(result.translatedText());
+                     MutableText translationText = Text.literal(speakerPrefix + result.translatedText());
                      MinecraftClient client = MinecraftClient.getInstance();
                      client.execute(() -> ChatMessageDispatcher.addWithoutReprocessing(client, translationText));
                   }
