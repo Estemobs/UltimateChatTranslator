@@ -5,24 +5,29 @@ import duke.e.chat_language_translate.client.ModConfig;
 import duke.e.chat_language_translate.client.WorldTextTranslationCache;
 import net.minecraft.block.entity.SignText;
 import net.minecraft.client.render.block.entity.SignBlockEntityRenderer;
+import net.minecraft.text.OrderedText;
+import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.Redirect;
+
+import java.util.function.Function;
 
 @Mixin(SignBlockEntityRenderer.class)
 public class SignBlockEntityRendererMixin {
-   @ModifyVariable(
+   @Redirect(
       method = "renderText(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/entity/SignText;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IIIZ)V",
-      at = @At("HEAD"),
-      argsOnly = true,
-      index = 1
+      at = @At(
+         value = "INVOKE",
+         target = "Lnet/minecraft/block/entity/SignText;getOrderedMessages(ZLjava/util/function/Function;)[Lnet/minecraft/text/OrderedText;"
+      )
    )
-   private SignText onRenderSignText(SignText signText) {
-      if (!ModConfig.get().modEnabled || !ModConfig.get().translateWorldText) {
-         return signText;
+   private OrderedText[] onGetOrderedMessages(SignText signText, boolean filtered, Function<Text, OrderedText> messageOrderer) {
+      SignText source = signText;
+      if (ModConfig.get().modEnabled && ModConfig.get().translateWorldText) {
+         String targetLang = ChatTranslationRules.resolveTargetLanguageCode(false);
+         source = WorldTextTranslationCache.translateSignText(signText, targetLang);
       }
-
-      String targetLang = ChatTranslationRules.resolveTargetLanguageCode(false);
-      return WorldTextTranslationCache.translateSignText(signText, targetLang);
+      return source.getOrderedMessages(filtered, messageOrderer);
    }
 }
