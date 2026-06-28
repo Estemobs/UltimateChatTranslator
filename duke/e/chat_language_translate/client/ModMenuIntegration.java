@@ -7,7 +7,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.TextFieldWidget;
 
 public class ModMenuIntegration implements ModMenuApi {
    public ConfigScreenFactory<?> getModConfigScreenFactory() {
@@ -23,83 +22,104 @@ public class ModMenuIntegration implements ModMenuApi {
       private ButtonWidget receivedLangBtn;
       private ButtonWidget sentLangBtn;
       private ButtonWidget debugBtn;
-      private boolean tempEnabled;
-      private boolean tempAuto;
-      private boolean tempDebug;
-      private ModConfig.Language tempReceivedLang;
-      private ModConfig.Language tempSentLang;
+      private ButtonWidget translateWorldBtn;
+      private ButtonWidget menuLangBtn;
+      private ButtonWidget saveBtn;
+      private ButtonWidget cancelBtn;
+      private Text displayTitle;
+      private final ConfigScreenState state;
 
       protected ConfigScreen(Screen parent) {
-         super(Text.literal("Chat Language Translate — Config"));
-         this.tempEnabled = ModConfig.get().modEnabled;
-         this.tempAuto = ModConfig.get().autoTranslate;
-         this.tempDebug = ModConfig.get().debugMode;
-         this.tempReceivedLang = ModConfig.get().primaryLanguage;
-         this.tempSentLang = ModConfig.get().sentLanguage;
+         super(Text.literal("Universal Chat Translator — Settings"));
+         this.state = new ConfigScreenState(ModConfig.get());
          this.parent = parent;
       }
 
       protected void init() {
          int centerX = this.width / 2;
-         int startY = this.height / 2 - 50;
+         int startY = this.height / 2 - 65;
 
-         // Mod Enabled
-         this.toggleEnabledBtn = ButtonWidget.builder(Text.literal("Mod Enabled: " + (this.tempEnabled ? "ON" : "OFF")), (btn) -> {
-            this.tempEnabled = !this.tempEnabled;
-            btn.setMessage(Text.literal("Mod Enabled: " + (this.tempEnabled ? "ON" : "OFF")));
+         this.toggleEnabledBtn = ButtonWidget.builder(Text.empty(), (btn) -> {
+            this.state.toggleEnabled();
+            this.refreshLabels();
          }).dimensions(centerX - 100, startY, 200, 20).build();
          this.addDrawableChild(this.toggleEnabledBtn);
 
-         // Auto Translate Mode
-         this.toggleAutoBtn = ButtonWidget.builder(Text.literal("Mode: " + (this.tempAuto ? "Auto Translate" : "Button Mode")), (btn) -> {
-            this.tempAuto = !this.tempAuto;
-            btn.setMessage(Text.literal("Mode: " + (this.tempAuto ? "Auto Translate" : "Button Mode")));
+         this.toggleAutoBtn = ButtonWidget.builder(Text.empty(), (btn) -> {
+            this.state.toggleAutoTranslate();
+            this.refreshLabels();
          }).dimensions(centerX - 100, startY + 25, 200, 20).build();
          this.addDrawableChild(this.toggleAutoBtn);
 
-         // Received Messages Language
-         this.receivedLangBtn = ButtonWidget.builder(Text.literal("Langue msgs reçus: " + this.tempReceivedLang.toString()), (btn) -> {
-            int nextIdx = (this.tempReceivedLang.ordinal() + 1) % ModConfig.Language.values().length;
-            this.tempReceivedLang = ModConfig.Language.values()[nextIdx];
-            btn.setMessage(Text.literal("Langue msgs reçus: " + this.tempReceivedLang.toString()));
+         this.receivedLangBtn = ButtonWidget.builder(Text.empty(), (btn) -> {
+            this.state.nextReceivedLanguage();
+            this.refreshLabels();
          }).dimensions(centerX - 100, startY + 50, 200, 20).build();
          this.addDrawableChild(this.receivedLangBtn);
 
-         // Sent Messages Language
-         this.sentLangBtn = ButtonWidget.builder(Text.literal("Langue msgs envoyés: " + this.tempSentLang.toString()), (btn) -> {
-            int nextIdx = (this.tempSentLang.ordinal() + 1) % ModConfig.Language.values().length;
-            this.tempSentLang = ModConfig.Language.values()[nextIdx];
-            btn.setMessage(Text.literal("Langue msgs envoyés: " + this.tempSentLang.toString()));
+         this.sentLangBtn = ButtonWidget.builder(Text.empty(), (btn) -> {
+            this.state.nextSentLanguage();
+            this.refreshLabels();
          }).dimensions(centerX - 100, startY + 75, 200, 20).build();
          this.addDrawableChild(this.sentLangBtn);
 
-         // Debug Mode
-         this.debugBtn = ButtonWidget.builder(Text.literal("Debug: " + (this.tempDebug ? "ON" : "OFF")), (btn) -> {
-            this.tempDebug = !this.tempDebug;
-            btn.setMessage(Text.literal("Debug: " + (this.tempDebug ? "ON" : "OFF")));
+         this.debugBtn = ButtonWidget.builder(Text.empty(), (btn) -> {
+            this.state.toggleDebugMode();
+            this.refreshLabels();
          }).dimensions(centerX - 100, startY + 100, 200, 20).build();
          this.addDrawableChild(this.debugBtn);
 
-         // Save Button
-         this.addDrawableChild(ButtonWidget.builder(Text.literal("Save"), (btn) -> {
-            ModConfig.get().modEnabled = this.tempEnabled;
-            ModConfig.get().autoTranslate = this.tempAuto;
-            ModConfig.get().primaryLanguage = this.tempReceivedLang;
-            ModConfig.get().sentLanguage = this.tempSentLang;
-            ModConfig.get().debugMode = this.tempDebug;
+         this.translateWorldBtn = ButtonWidget.builder(Text.empty(), (btn) -> {
+            this.state.toggleTranslateWorldText();
+            this.refreshLabels();
+         }).dimensions(centerX - 100, startY + 125, 200, 20).build();
+         this.addDrawableChild(this.translateWorldBtn);
+
+         this.menuLangBtn = ButtonWidget.builder(Text.empty(), (btn) -> {
+            this.state.nextMenuLanguage();
+            this.refreshLabels();
+         }).dimensions(centerX - 100, startY + 150, 200, 20).build();
+         this.addDrawableChild(this.menuLangBtn);
+
+         this.saveBtn = ButtonWidget.builder(Text.empty(), (btn) -> {
+            this.state.saveTo(ModConfig.get());
             ModConfig.save();
             MinecraftClient.getInstance().setScreen(this.parent);
-         }).dimensions(centerX - 100, startY + 135, 95, 20).build());
+         }).dimensions(centerX - 100, startY + 185, 95, 20).build();
+         this.addDrawableChild(this.saveBtn);
 
-         // Cancel Button
-         this.addDrawableChild(ButtonWidget.builder(Text.literal("Cancel"), (btn) -> {
+         this.cancelBtn = ButtonWidget.builder(Text.empty(), (btn) -> {
             MinecraftClient.getInstance().setScreen(this.parent);
-         }).dimensions(centerX + 5, startY + 135, 95, 20).build());
+         }).dimensions(centerX + 5, startY + 185, 95, 20).build();
+         this.addDrawableChild(this.cancelBtn);
+
+         this.refreshLabels();
+      }
+
+      private void refreshLabels() {
+         ModConfig.Language menuLang = this.state.getMenuLanguage();
+         String on = MenuLocalization.ON.get(menuLang);
+         String off = MenuLocalization.OFF.get(menuLang);
+
+         this.displayTitle = Text.literal(MenuLocalization.TITLE.get(menuLang));
+
+         this.toggleEnabledBtn.setMessage(Text.literal(MenuLocalization.MOD_ENABLED.get(menuLang) + ": " + (this.state.isEnabled() ? on : off)));
+
+         String mode = this.state.isAutoTranslate() ? MenuLocalization.MODE_AUTO.get(menuLang) : MenuLocalization.MODE_BUTTON.get(menuLang);
+         this.toggleAutoBtn.setMessage(Text.literal(MenuLocalization.MODE_PREFIX.get(menuLang) + mode));
+
+         this.receivedLangBtn.setMessage(Text.literal(MenuLocalization.RECEIVED_LANG_PREFIX.get(menuLang) + this.state.getReceivedLanguage()));
+         this.sentLangBtn.setMessage(Text.literal(MenuLocalization.SENT_LANG_PREFIX.get(menuLang) + this.state.getSentLanguage()));
+         this.debugBtn.setMessage(Text.literal(MenuLocalization.DEBUG_PREFIX.get(menuLang) + (this.state.isDebugMode() ? on : off)));
+         this.translateWorldBtn.setMessage(Text.literal(MenuLocalization.WORLD_TEXT_PREFIX.get(menuLang) + (this.state.isTranslateWorldText() ? on : off)));
+         this.menuLangBtn.setMessage(Text.literal(MenuLocalization.MENU_LANG_PREFIX.get(menuLang) + menuLang));
+         this.saveBtn.setMessage(Text.literal(MenuLocalization.SAVE.get(menuLang)));
+         this.cancelBtn.setMessage(Text.literal(MenuLocalization.CANCEL.get(menuLang)));
       }
 
       public void render(DrawContext context, int mouseX, int mouseY, float delta) {
          super.render(context, mouseX, mouseY, delta);
-         context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, this.height / 2 - 80, 16777215);
+         context.drawCenteredTextWithShadow(this.textRenderer, this.displayTitle, this.width / 2, this.height / 2 - 95, 16777215);
       }
 
       public boolean shouldCloseOnEsc() {

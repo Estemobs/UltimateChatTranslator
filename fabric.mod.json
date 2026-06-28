@@ -1,12 +1,15 @@
 {
   "schemaVersion": 1,
   "id": "chat_language_translate",
-  "version": "1.0.0",
-  "name": "Chat Language Translate",
-  "description": "Translates incoming chat messages to your configured primary language.",
+  "version": "${version}",
+  "name": "Universal Chat Translator",
+  "description": "Automatically translates chat messages, signs, and in-game menus to the language of your choice.",
   "authors": [],
-  "contact": {},
-  "license": "All-Rights-Reserved",
+  "contact": {
+    "sources": "https://github.com/Estemobs/UniversalChatTranslator"
+  },
+  "license": "MIT",
+  "icon": "assets/chat_language_translate/icon.png",
   "environment": "*",
   "entrypoints": {
     "client": [

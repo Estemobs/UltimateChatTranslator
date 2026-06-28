@@ -11,7 +11,7 @@ import net.fabricmc.loader.api.FabricLoader;
 
 public class ModConfig {
    private static final Gson GSON = (new GsonBuilder()).setPrettyPrinting().create();
-   private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("chat_language_translate.json");
+   private static final Path CONFIG_PATH = resolveConfigPath();
    private static ModConfig INSTANCE = new ModConfig();
    public ModConfig.Language primaryLanguage;
    public boolean modEnabled;
@@ -19,6 +19,8 @@ public class ModConfig {
    public String buttonText;
    public ModConfig.Language sentLanguage;
    public boolean debugMode;
+   public boolean translateWorldText;
+   public ModConfig.Language menuLanguage;
 
    public ModConfig() {
       this.primaryLanguage = ModConfig.Language.TURKISH;
@@ -27,10 +29,24 @@ public class ModConfig {
       this.buttonText = "[Çevir]";
       this.sentLanguage = ModConfig.Language.TURKISH;
       this.debugMode = false;
+      this.translateWorldText = true;
+      this.menuLanguage = ModConfig.Language.ENGLISH;
    }
 
    public static ModConfig get() {
       return INSTANCE;
+   }
+
+   private static Path resolveConfigPath() {
+      try {
+         FabricLoader loader = FabricLoader.getInstance();
+         if (loader != null && loader.getConfigDir() != null) {
+            return loader.getConfigDir().resolve("chat_language_translate.json");
+         }
+      } catch (Exception ignored) {
+      }
+
+      return Path.of("config", "chat_language_translate.json");
    }
 
    public static void load() {
@@ -44,6 +60,14 @@ public class ModConfig {
                   INSTANCE = new ModConfig();
                } else if (INSTANCE.primaryLanguage == null) {
                   INSTANCE.primaryLanguage = ModConfig.Language.TURKISH;
+               }
+
+               if (INSTANCE.sentLanguage == null) {
+                  INSTANCE.sentLanguage = ModConfig.Language.TURKISH;
+               }
+
+               if (INSTANCE.menuLanguage == null) {
+                  INSTANCE.menuLanguage = ModConfig.Language.ENGLISH;
                }
             } catch (Throwable var4) {
                if (reader != null) {
