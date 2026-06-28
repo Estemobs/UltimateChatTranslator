@@ -22,7 +22,7 @@ public class Chat_language_translateClient implements ClientModInitializer {
       // Message de démarrage
       MinecraftClient.getInstance().execute(() -> {
          MinecraftClient client = MinecraftClient.getInstance();
-         ChatMessageDispatcher.addWithoutReprocessing(client, Text.literal("✓ Lingo chargé!"));
+         ChatMessageDispatcher.addWithoutReprocessing(client, Text.literal("✓ Ultimate Chat Translator chargé!"));
       });
 
       ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
