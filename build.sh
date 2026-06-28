@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Lingo - Build Script
+# Ultimate Chat Translator - Build Script
 # Installe les dependances manquantes (Arch/Debian) puis compile le JAR
 
 set -e
@@ -13,7 +13,7 @@ NC='\033[0m'
 
 echo -e "${YELLOW}"
 echo "◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆"
-echo "  Lingo - Build"
+echo "  Ultimate Chat Translator - Build"
 echo "◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆"
 echo -e "${NC}"
 
