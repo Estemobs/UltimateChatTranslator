@@ -30,4 +30,10 @@ jobs:
           gradle-version: 8.8
 
       - name: Run tests
-        run: gradle test
+        run: |
+          for attempt in 1 2 3; do
+            gradle test && break
+            if [ "$attempt" = 3 ]; then exit 1; fi
+            echo "gradle test failed (attempt $attempt), retrying after dependency-resolution hiccup..."
+            sleep $((attempt * 15))
+          done

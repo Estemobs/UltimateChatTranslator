@@ -34,7 +34,13 @@ jobs:
           sed -i "s/^mod_version=.*/mod_version=${VERSION}/" gradle.properties
 
       - name: Build
-        run: gradle build
+        run: |
+          for attempt in 1 2 3; do
+            gradle build && break
+            if [ "$attempt" = 3 ]; then exit 1; fi
+            echo "gradle build failed (attempt $attempt), retrying after dependency-resolution hiccup..."
+            sleep $((attempt * 15))
+          done
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
