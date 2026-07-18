@@ -80,8 +80,3 @@ Issues and pull requests are welcome. The test suite (`./gradlew test`) covers t
 ## License
 
 Released under the [MIT License](LICENSE).
-
-## Links
-
-- [GitHub](https://github.com/Estemobs/UltimateChatTranslator)
-- [Gitea](http://192.168.1.109:3000/estemobs/UltimateChatTranslator)
