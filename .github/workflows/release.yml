@@ -4,6 +4,11 @@ on:
   release:
     types: [published]
   workflow_dispatch:
+    inputs:
+      mc_version:
+        description: 'Minecraft version (1.20.1, 1.21.1, 1.21.4, 1.21.8)'
+        required: true
+        default: '1.21.1'
 
 permissions:
   contents: write
@@ -12,8 +17,29 @@ jobs:
   build-and-publish:
     runs-on: ubuntu-latest
     steps:
+      - name: Parse MC version
+        id: parse
+        run: |
+          TAG="${{ github.ref_name }}"
+          MC_VER="${TAG##*-mc}"
+          if [ "$MC_VER" = "$TAG" ]; then
+            MC_VER="1.21.1"
+          fi
+          echo "MC_VER=${MC_VER}" >> $GITHUB_ENV
+          echo "MC version: ${MC_VER}"
+
+      - name: Determine branch
+        run: |
+          if [ "${{ env.MC_VER }}" = "1.21.1" ]; then
+            echo "BRANCH=main" >> $GITHUB_ENV
+          else
+            echo "BRANCH=mc-${{ env.MC_VER }}" >> $GITHUB_ENV
+          fi
+
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ env.BRANCH }}
 
       - name: Setup Java 21
         uses: actions/setup-java@v4
@@ -21,25 +47,32 @@ jobs:
           distribution: temurin
           java-version: "21"
 
-      - name: Setup Gradle 8.8
+      - name: Determine Gradle version
+        run: |
+          case "${{ env.MC_VER }}" in
+            1.20.1) GRADLE_VER="8.8" ;;
+            1.21.1) GRADLE_VER="8.8" ;;
+            1.21.4) GRADLE_VER="8.11" ;;
+            1.21.8) GRADLE_VER="8.12" ;;
+            *)      GRADLE_VER="8.8" ;;
+          esac
+          echo "GRADLE_VER=${GRADLE_VER}" >> $GITHUB_ENV
+
+      - name: Setup Gradle ${{ env.GRADLE_VER }}
         uses: gradle/actions/setup-gradle@v3
         with:
-          gradle-version: 8.8
+          gradle-version: ${{ env.GRADLE_VER }}
 
       - name: Set version from tag
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
+          VERSION="${VERSION%%-mc*}"
           sed -i "s/^mod_version=.*/mod_version=${VERSION}/" gradle.properties
           echo "VERSION=${VERSION}" >> $GITHUB_ENV
+          echo "Version: ${VERSION}"
 
       - name: Build
-        run: |
-          for attempt in 1 2 3; do
-            gradle build && break
-            if [ "$attempt" = 3 ]; then exit 1; fi
-            echo "gradle build failed (attempt $attempt), retrying after dependency-resolution hiccup..."
-            sleep $((attempt * 15))
-          done
+        run: gradle clean build
 
       - name: Publish to CurseForge & GitHub
         uses: Kir-Antipov/mc-publish@v3.3
@@ -52,11 +85,12 @@ jobs:
 
           curseforge-files: "build/libs/!(*-@(dev|sources|javadoc)).jar"
 
-          name: "Ultimate Chat Translator ${{ env.VERSION }}"
-          version: "${{ env.VERSION }}"
+          name: "Ultimate Chat Translator ${{ env.VERSION }} (MC ${{ env.MC_VER }})"
+          version: "${{ env.VERSION }}+mc${{ env.MC_VER }}"
           version-type: release
           changelog-file: CHANGELOG.md
 
+          game-versions: "${{ env.MC_VER }}"
           loaders: fabric
           java: Java 21
 
