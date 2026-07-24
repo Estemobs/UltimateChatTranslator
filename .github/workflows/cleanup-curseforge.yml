@@ -1,6 +1,7 @@
 name: Cleanup CurseForge
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
 
 jobs:
   cleanup:
