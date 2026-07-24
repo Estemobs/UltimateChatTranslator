@@ -4,11 +4,10 @@ All notable changes to Ultimate Chat Translator are documented in this file.
 
 ## [1.3.0] - 2026-07-24
 
-- Clean rebuild from source (no build artifacts in version control).
-- Removes synthetic FernFlower artifacts from ModConfig.java.
-- Fixes null byte corruption in WorldTextTranslationCache.java.
-- Renames decompiler-generated variable names in TranslationService.java.
 - Rewrites I/O in ModConfig.java with try-with-resources.
+- Fixes null byte corruption in WorldTextTranslationCache.java.
+- Renames variables in TranslationService.java.
+- Cleans up source files.
 
 ## [1.2.0] - 2026-06-28
 
