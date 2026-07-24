@@ -33,7 +33,7 @@
 
 ## Installation
 
-1. Download the `.jar` matching your Minecraft version (e.g. `chat_language_translate-1.2.0.mc1.21.1.jar` for 1.21.1) from:
+1. Download the `.jar` matching your Minecraft version (e.g. `chat_language_translate-1.3.0.mc1.21.1.jar` for 1.21.1) from:
    - **[CurseForge](https://www.curseforge.com/minecraft/mc-mods/ultimate-chat-translator)** (recommended), or
    - the [GitHub Releases](https://github.com/Estemobs/UltimateChatTranslator/releases) page
 2. Drop it into your `mods` folder alongside Fabric API.
