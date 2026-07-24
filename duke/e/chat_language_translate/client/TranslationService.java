@@ -20,8 +20,8 @@ public class TranslationService {
       return CompletableFuture.supplyAsync(() -> {
          try {
             String encoded = URLEncoder.encode(text, StandardCharsets.UTF_8);
-            String var10000 = URLEncoder.encode(targetLang, StandardCharsets.UTF_8);
-            String url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=" + var10000 + "&dt=t&dt=ld&q=" + encoded;
+             String encodedTarget = URLEncoder.encode(targetLang, StandardCharsets.UTF_8);
+             String url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=" + encodedTarget + "&dt=t&dt=ld&q=" + encoded;
             HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).header("User-Agent", "Mozilla/5.0").GET().build();
             HttpResponse<String> response = HTTP_CLIENT.send(request, BodyHandlers.ofString());
             if (response.statusCode() != 200) {
@@ -35,7 +35,7 @@ public class TranslationService {
                   try {
                      String segment = sentences.get(i).getAsJsonArray().get(0).getAsString();
                      translated.append(segment);
-                  } catch (Exception var12) {
+                  } catch (Exception ignored) {
                   }
                }
 
@@ -43,15 +43,15 @@ public class TranslationService {
 
                try {
                   detectedLang = root.get(2).getAsString();
-               } catch (Exception var11) {
+               } catch (Exception ignored) {
                }
 
                return new TranslationService.TranslationResult(detectedLang, translated.toString().trim());
             }
-         } catch (InterruptedException | IOException var13) {
+         } catch (InterruptedException | IOException e) {
             Thread.currentThread().interrupt();
             return null;
-         } catch (Exception var14) {
+         } catch (Exception e) {
             return null;
          }
       });
