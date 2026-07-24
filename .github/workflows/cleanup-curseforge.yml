@@ -1,0 +1,69 @@
+name: Cleanup CurseForge Duplicates
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type "yes" to confirm deletion'
+        required: true
+        default: 'no'
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    if: github.event.inputs.confirm == 'yes'
+    steps:
+      - name: Fetch and delete old CurseForge files
+        run: |
+          API="https://api.curseforge.com/v1"
+          MOD_ID="1623505"
+          TOKEN="${{ secrets.CURSEFORGE_TOKEN }}"
+
+          fetch_page() {
+            curl -s "$API/mods/$MOD_ID/files?pageSize=50&pageIndex=$1" \
+              -H "x-api-key: $TOKEN" -H "Accept: application/json"
+          }
+
+          all_files=$(
+            for page in 0 1 2 3; do
+              fetch_page $page | python3 -c "import json,sys; d=json.load(sys.stdin)
+for f in d.get('data',[]):
+    print(f['id'], '|', f.get('displayName',''), '|', f.get('fileName',''))
+" 2>/dev/null
+            done
+          )
+
+          echo "=== All files on CurseForge ==="
+          echo "$all_files"
+          echo ""
+
+          KEEP_LATEST=""
+          KEEP_COUNT=0
+          DELETE_LIST=""
+
+          while IFS='|' read -r fid name fname; do
+            fid=$(echo "$fid" | xargs)
+            name=$(echo "$name" | xargs)
+            fname=$(echo "$fname" | xargs)
+
+            # Keep files matching our new naming
+            if echo "$name" | grep -q "^ultimate-chat-translator-"; then
+              KEEP_LATEST="$fid"
+              KEEP_COUNT=$((KEEP_COUNT + 1))
+              echo "KEEP [$fid] $name"
+              continue
+            fi
+
+            # Mark others for deletion
+            DELETE_LIST="$DELETE_LIST $fid"
+            echo "DELETE [$fid] $name"
+          done <<< "$all_files"
+
+          echo ""
+          echo "=== Deleting old files ==="
+          for fid in $DELETE_LIST; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" -X DELETE \
+              "$API/mods/$MOD_ID/files/$fid" \
+              -H "x-api-key: $TOKEN" -H "Accept: application/json")
+            echo "  Delete file $fid: HTTP $code"
+          done
