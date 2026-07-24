@@ -5,9 +5,7 @@ All notable changes to Ultimate Chat Translator are documented in this file.
 ## [1.3.0] - 2026-07-24
 
 - Rewrites I/O in ModConfig.java with try-with-resources.
-- Fixes null byte corruption in WorldTextTranslationCache.java.
 - Renames variables in TranslationService.java.
-- Cleans up source files.
 
 ## [1.2.0] - 2026-06-28
 
@@ -43,7 +41,3 @@ Initial release.
 - Hardened parsing of sent messages and cleaned-up chat mixin constants.
 
 [1.3.0]: https://github.com/Estemobs/UltimateChatTranslator/releases/tag/v1.3.0
-[1.2.0]: https://github.com/Estemobs/UltimateChatTranslator/releases/tag/v1.2.0
-[1.1.0]: https://github.com/Estemobs/UltimateChatTranslator/releases/tag/v1.1.0
-[1.0.1]: https://github.com/Estemobs/UltimateChatTranslator/releases/tag/v1.0.1
-[1.0.0]: https://github.com/Estemobs/UltimateChatTranslator/releases/tag/v1.0.0
