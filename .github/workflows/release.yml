@@ -72,7 +72,13 @@ jobs:
           echo "Version: ${VERSION}"
 
       - name: Build
-        run: gradle clean build
+        run: |
+          for attempt in 1 2 3; do
+            gradle clean build && break
+            if [ "$attempt" = 3 ]; then exit 1; fi
+            echo "Build failed (attempt $attempt), retrying..."
+            sleep $((attempt * 15))
+          done
 
       - name: Publish to CurseForge & GitHub
         uses: Kir-Antipov/mc-publish@v3.3
