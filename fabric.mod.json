@@ -40,7 +40,6 @@
   },
   "custom": {
     "mc-publish": {
-      "curseforge": 1623505,
       "loaders": ["fabric"]
     }
   }
