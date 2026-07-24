@@ -107,7 +107,7 @@ jobs:
 
           curseforge-files: "build/libs/!(*-@(dev|sources|javadoc)).jar"
 
-          name: ""
+          name: "ultimate-chat-translator-${{ env.VERSION }}"
           version: "${{ env.VERSION }}+mc${{ env.MC_VER }}"
           version-type: release
           changelog-file: CHANGELOG.md
