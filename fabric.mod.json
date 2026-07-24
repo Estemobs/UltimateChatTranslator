@@ -40,7 +40,7 @@
   },
   "custom": {
     "mc-publish": {
-      "curseforge": "ultimate-chat-translator",
+      "curseforge": 1623505,
       "loaders": ["fabric"]
     }
   }
