@@ -50,71 +50,35 @@ public class ModConfig {
    }
 
    public static void load() {
-      if (Files.exists(CONFIG_PATH, new LinkOption[0])) {
-         try {
-            BufferedReader reader = Files.newBufferedReader(CONFIG_PATH);
-
-            try {
-               INSTANCE = (ModConfig)GSON.fromJson(reader, ModConfig.class);
-               if (INSTANCE == null) {
-                  INSTANCE = new ModConfig();
-               } else if (INSTANCE.primaryLanguage == null) {
-                  INSTANCE.primaryLanguage = ModConfig.Language.TURKISH;
-               }
-
-               if (INSTANCE.sentLanguage == null) {
-                  INSTANCE.sentLanguage = ModConfig.Language.TURKISH;
-               }
-
-               if (INSTANCE.menuLanguage == null) {
-                  INSTANCE.menuLanguage = ModConfig.Language.ENGLISH;
-               }
-            } catch (Throwable var4) {
-               if (reader != null) {
-                  try {
-                     reader.close();
-                  } catch (Throwable var3) {
-                     var4.addSuppressed(var3);
-                  }
-               }
-
-               throw var4;
-            }
-
-            if (reader != null) {
-               reader.close();
-            }
-         } catch (Exception var5) {
-            INSTANCE = new ModConfig();
-         }
+      if (!Files.exists(CONFIG_PATH, new LinkOption[0])) {
+         return;
       }
-
+      try (BufferedReader reader = Files.newBufferedReader(CONFIG_PATH)) {
+         INSTANCE = GSON.fromJson(reader, ModConfig.class);
+         if (INSTANCE == null) {
+            INSTANCE = new ModConfig();
+            return;
+         }
+         if (INSTANCE.primaryLanguage == null) {
+            INSTANCE.primaryLanguage = ModConfig.Language.TURKISH;
+         }
+         if (INSTANCE.sentLanguage == null) {
+            INSTANCE.sentLanguage = ModConfig.Language.TURKISH;
+         }
+         if (INSTANCE.menuLanguage == null) {
+            INSTANCE.menuLanguage = ModConfig.Language.ENGLISH;
+         }
+      } catch (Exception e) {
+         INSTANCE = new ModConfig();
+      }
    }
 
    public static void save() {
-      try {
-         BufferedWriter writer = Files.newBufferedWriter(CONFIG_PATH);
-
-         try {
-            GSON.toJson(INSTANCE, writer);
-         } catch (Throwable var4) {
-            if (writer != null) {
-               try {
-                  writer.close();
-               } catch (Throwable var3) {
-                  var4.addSuppressed(var3);
-               }
-            }
-
-            throw var4;
-         }
-
-         if (writer != null) {
-            writer.close();
-         }
-      } catch (Exception var5) {
+      try (BufferedWriter writer = Files.newBufferedWriter(CONFIG_PATH)) {
+         GSON.toJson(INSTANCE, writer);
+      } catch (Exception e) {
+         // ignore
       }
-
    }
 
    public static enum Language {
@@ -158,9 +122,5 @@ public class ModConfig {
          return this.name;
       }
 
-      // $FF: synthetic method
-      private static ModConfig.Language[] $values() {
-         return new ModConfig.Language[]{TURKISH, ENGLISH, GERMAN, FRENCH, SPANISH, RUSSIAN, JAPANESE, CHINESE, KOREAN, ITALIAN, PORTUGUESE};
-      }
    }
 }

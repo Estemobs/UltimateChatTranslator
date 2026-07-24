@@ -19,7 +19,6 @@ public class Chat_language_translateClient implements ClientModInitializer {
    public void onInitializeClient() {
       ModConfig.load();
 
-      // Message de démarrage
       MinecraftClient.getInstance().execute(() -> {
          MinecraftClient client = MinecraftClient.getInstance();
          ChatMessageDispatcher.addWithoutReprocessing(client, Text.literal("✓ Ultimate Chat Translator chargé!"));
