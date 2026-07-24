@@ -50,11 +50,11 @@ jobs:
       - name: Determine Gradle version
         run: |
           case "${{ env.MC_VER }}" in
-            1.20.1) GRADLE_VER="8.11" ;;
-            1.21.1) GRADLE_VER="8.11" ;;
+            1.20.1) GRADLE_VER="8.8" ;;
+            1.21.1) GRADLE_VER="8.8" ;;
             1.21.4) GRADLE_VER="8.11" ;;
             1.21.8) GRADLE_VER="8.12" ;;
-            *)      GRADLE_VER="8.11" ;;
+            *)      GRADLE_VER="8.8" ;;
           esac
           echo "GRADLE_VER=${GRADLE_VER}" >> $GITHUB_ENV
 
@@ -80,7 +80,23 @@ jobs:
             sleep $((attempt * 15))
           done
 
+      - name: Check for existing CurseForge upload
+        id: check_cf
+        run: |
+          MARKER="<!-- cf-uploaded -->"
+          BODY=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/releases/tags/${{ github.ref_name }}" \
+            | python3 -c "import json,sys; print(json.load(sys.stdin).get('body',''))")
+          if echo "$BODY" | grep -q "$MARKER"; then
+            echo "CurseForge upload already done for this release. Skipping."
+            echo "skip=true" >> $GITHUB_ENV
+          else
+            echo "skip=false" >> $GITHUB_ENV
+          fi
+
       - name: Publish to CurseForge & GitHub
+        id: publish
+        if: env.skip != 'true'
         uses: Kir-Antipov/mc-publish@v3.3
         with:
           curseforge-id: 1623505
@@ -91,7 +107,7 @@ jobs:
 
           curseforge-files: "build/libs/!(*-@(dev|sources|javadoc)).jar"
 
-          name: ""
+          name: "ultimate-chat-translator-${{ env.VERSION }}"
           version: "${{ env.VERSION }}+mc${{ env.MC_VER }}"
           version-type: release
           changelog-file: CHANGELOG.md
@@ -103,3 +119,33 @@ jobs:
           dependencies: |
             fabric-api(required)
             modmenu(optional)
+
+      - name: Mark release as uploaded
+        if: steps.publish.outcome == 'success'
+        run: |
+          python3 -c "
+import json, os, urllib.request
+token = os.environ['GITHUB_TOKEN']
+repo = os.environ['GITHUB_REPOSITORY']
+tag = os.environ['GITHUB_REF_NAME']
+
+req = urllib.request.Request(f'https://api.github.com/repos/{repo}/releases/tags/{tag}',
+    headers={'Authorization': f'Bearer {token}', 'Accept': 'application/vnd.github.v3+json'})
+with urllib.request.urlopen(req) as r:
+    rel = json.load(r)
+rid = rel['id']
+body = rel.get('body', '') or ''
+
+MARKER = '<!-- cf-uploaded -->'
+if MARKER in body:
+    exit(0)
+
+new_body = body + '\n' + MARKER
+data = json.dumps({'body': new_body}).encode()
+req2 = urllib.request.Request(f'https://api.github.com/repos/{repo}/releases/{rid}',
+    data=data, method='PATCH',
+    headers={'Authorization': f'Bearer {token}', 'Content-Type': 'application/json',
+             'Accept': 'application/vnd.github.v3+json'})
+with urllib.request.urlopen(req2) as r:
+    print(f'Marked release {rid} as uploaded')
+"
