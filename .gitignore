@@ -19,6 +19,8 @@ gradlew.bat
 .DS_Store
 Thumbs.db
 
+bin/
+
 # Misc
 *.bak
 *.log
