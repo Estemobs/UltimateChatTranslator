@@ -2,10 +2,21 @@
 
 All notable changes to Ultimate Chat Translator are documented in this file.
 
+## [1.3.1] - 2026-07-27
+
+### Fixed
+- Auto-translated outgoing messages now properly show the translated text instead of the original to other players
+- Sign translation no longer flickers on dedicated servers
+- Several Brazilian Portuguese and Chinese translations in the settings GUI
+
+### Changed
+- Translation service now uses a more reliable Google Translate endpoint — no API key required
+- Reduced redundant re-translation calls when switching languages
+
 ## [1.3.0] - 2026-07-24
 
-- Rewrites I/O in ModConfig.java with try-with-resources.
-- Renames variables in TranslationService.java.
+- Rewrites I/O in ModConfig.java with try-with-resources
+- Renames variables in TranslationService.java
 
 ## [1.2.0] - 2026-06-28
 
