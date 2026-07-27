@@ -9,6 +9,7 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Minecraft 1.20.1 - 1.21.8](https://img.shields.io/badge/Minecraft-1.20.1%20--%201.21.8-blue.svg)](https://fabricmc.net/)
 [![Test Mod](https://github.com/Estemobs/UltimateChatTranslator/actions/workflows/tests.yml/badge.svg)](https://github.com/Estemobs/UltimateChatTranslator/actions/workflows/tests.yml)
+[![Modrinth](https://img.shields.io/modrinth/v/ultimatechattranslator?label=Modrinth&color=00af5c)](https://modrinth.com/project/ultimatechattranslator)
 [![GitHub Releases](https://img.shields.io/github/v/release/Estemobs/UltimateChatTranslator)](https://github.com/Estemobs/UltimateChatTranslator/releases)
 
 </div>
@@ -32,7 +33,7 @@
 
 ## Installation
 
-1. Download the `.jar` matching your Minecraft version from the [GitHub Releases](https://github.com/Estemobs/UltimateChatTranslator/releases) page.
+1. Download the `.jar` matching your Minecraft version from [Modrinth](https://modrinth.com/project/ultimatechattranslator) or [GitHub Releases](https://github.com/Estemobs/UltimateChatTranslator/releases).
 2. Drop it into your `mods` folder alongside Fabric API.
 3. Launch Minecraft with the Fabric profile.
 4. Open the settings via Mod Menu (or edit the generated config file) to pick your languages.
@@ -72,7 +73,9 @@ The built jar is placed in `build/libs/`.
 
 ## How it works
 
-Translation is performed through Google Translate's public web endpoint — no API key required, but it relies on an undocumented endpoint and is best-effort (occasional rate limits or downtime are possible). All translation hooks are client-side only via [Fabric](https://fabricmc.net/) and [Mixin](https://github.com/SpongePowered/Mixin); no server-side component is needed.
+Translation is performed through Google Translate's public web endpoint — **no API key required**, no configuration needed. All translation hooks are client-side only via [Fabric](https://fabricmc.net/) and [Mixin](https://github.com/SpongePowered/Mixin); no server-side component is needed.
+
+> **Note:** The endpoint is undocumented and best-effort — occasional rate limits or downtime are possible.
 
 ## Contributing
 
