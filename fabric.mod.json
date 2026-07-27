@@ -33,9 +33,15 @@
   "depends": {
     "fabricloader": ">=0.18.4",
     "fabric-api": "*",
-    "minecraft": "1.21.1"
+    "minecraft": "1.21.8"
   },
   "suggests": {
     "modmenu": "*"
+  },
+  "custom": {
+    "mc-publish": {
+      "modrinth": "PzDoX6fL",
+      "loaders": ["fabric"]
+    }
   }
 }
