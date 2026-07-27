@@ -3,6 +3,9 @@ name: Build and Release JAR
 on:
   release:
     types: [published]
+  push:
+    tags:
+      - 'v*'
   workflow_dispatch:
     inputs:
       mc_version:
@@ -70,6 +73,18 @@ jobs:
           sed -i "s/^mod_version=.*/mod_version=${VERSION}/" gradle.properties
           echo "VERSION=${VERSION}" >> $GITHUB_ENV
           echo "Version: ${VERSION}"
+
+      - name: Create GitHub Release (if tag push)
+        if: github.event_name == 'push'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: "Ultimate Chat Translator ${{ env.VERSION }} (MC ${{ env.MC_VER }})"
+          body: "See [CHANGELOG](CHANGELOG.md) for details."
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build
         run: |
