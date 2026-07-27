@@ -120,6 +120,9 @@ jobs:
           github-tag: "${{ env.TAG }}"
           github-token: "${{ secrets.GITHUB_TOKEN }}"
 
+          modrinth-id: "ultimatechattranslator"
+          modrinth-token: "${{ secrets.MODRINTH_TOKEN }}"
+
           name: "Ultimate Chat Translator ${{ env.VERSION }} (MC ${{ env.MC_VER }})"
           version: "${{ env.VERSION }}+mc${{ env.MC_VER }}"
           version-type: release

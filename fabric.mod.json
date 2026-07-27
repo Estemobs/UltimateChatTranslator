@@ -40,6 +40,7 @@
   },
   "custom": {
     "mc-publish": {
+      "modrinth": "ultimatechattranslator",
       "loaders": ["fabric"]
     }
   }
