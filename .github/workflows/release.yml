@@ -76,7 +76,7 @@ jobs:
           echo "GRADLE_VER=${GRADLE_VER}" >> $GITHUB_ENV
 
       - name: Setup Gradle ${{ env.GRADLE_VER }}
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v6
         with:
           gradle-version: ${{ env.GRADLE_VER }}
 
